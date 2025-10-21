@@ -13,14 +13,16 @@ import warnings
 warnings.filterwarnings("ignore", message="No artists with labels found to put in legend.*")
 
 cntr = 0
-def save_sofar(plt, filename):
+def save_sofar(plt, filename, legend=True):
     global cntr
-    plt.legend(loc='upper left')
+    if legend:
+        plt.legend(loc='upper left')
     plt.savefig(f"plots/tmp/{cntr}_{filename}.png", bbox_inches='tight')
     out_dir = Path("plots/tmp")
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    plt.legend(loc="upper left")
+    if legend:
+        plt.legend(loc="upper left")
     plt.savefig(out_dir / f"{cntr}_{filename}.png", bbox_inches="tight")
     cntr += 1
 
@@ -91,7 +93,7 @@ plt.gca().spines['left'].set_visible(False)
 plt.gca().tick_params(axis='y', which='both', length=0)  # Keep y-ticks visible
 plt.gca().yaxis.set_visible(True)  # Ensure y-ticks remain visible
 
-save_sofar(plt, f"{year}_init")
+save_sofar(plt, f"{year}_init", legend=False)
 
 
 # Plot the normal temperature range. This should be a line going from the minimum to the maximum temperature
