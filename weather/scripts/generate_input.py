@@ -49,7 +49,7 @@ continent_locations = {
 }
 
 size_days = {
-    "min": 365*5,
+    "min": 365 * 1,
     "small": 365 * 15,
     "full": 365 * 30,
 }
