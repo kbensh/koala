@@ -135,7 +135,7 @@ if should_run "ohmyzsh"; then
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/ohmyzsh.sh")"
     export BENCHMARK_SCRIPT
-    export ZSH="$outputs_dir/ohmyzsh_install"
+    export ZSH="$input_dir/ohmyzsh"
     mkdir -p "$ZSH"
     # # Run in non-interactive mode
     # RUNZSH=no CHSH=no $KOALA_SHELL "$scripts_dir/ohmyzsh.sh"
