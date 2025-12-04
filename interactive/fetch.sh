@@ -4,6 +4,8 @@ set -e
 TOP=$(git rev-parse --show-toplevel)
 eval_dir="${TOP}/interactive"
 input_dir="${eval_dir}/inputs"
+cd "$(realpath "$(dirname "$0")")" || exit 1
+python3 utils/create_inputs.py
 
 ZSH_TARGET="${input_dir}/ohmyzsh"
 
