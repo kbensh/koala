@@ -1,28 +1,29 @@
 #!/bin/sh
 # source: https://bash.cyberciti.biz/networking/shell-script-to-find-linux-network-configurations/
-HWINF=/usr/sbin/hwinfo
-IFCFG=/sbin/ifconfig
-IP4FW=/sbin/iptables
-IP6FW=/sbin/ip6tables
-LSPCI=/usr/bin/lspci
-ROUTE=/sbin/route
-NETSTAT=/bin/netstat
-LSB=/usr/bin/lsb_release
-IP=/sbin/ip
-
 DNSCLIENT="/etc/resolv.conf"
 DRVCONF="/etc/modprobe.d"
 NETCFC="/etc/network/interfaces"
 SYSCTL="/etc/sysctl.conf"
 
+## Command paths ##
+lsb_release=$(command -v lsb_release)
+hwinfo=$(command -v hwinfo)
+lspci=$(command -v lspci)
+ifconfig=$(command -v ifconfig)
+ip=$(command -v ip)
+route=$(command -v route)
+iptables=$(command -v iptables)
+ip6tables=$(command -v ip6tables)
+netstat=$(command -v netstat)
+
 ## Output file ##
-OUTPUT="network.$(date +'%d-%m-%y').info.txt"
+OUTPUT="networkconf.txt"
 
 chk_root(){
 	meid=$(id -u)
 	if [ "$meid" -ne 0 ]; then
 		echo "You must be root user to run this tool"
-		exit 999
+		exit 1
 	fi
 }
 
@@ -38,43 +39,43 @@ dump_info(){
 
 	write_header "Linux Distro"
 	echo "Linux kernel: $(uname -mrs)" >> "$OUTPUT"
-	if [ -x "$LSB" ]; then
-		$LSB -a >> "$OUTPUT"
+	if [ -n "$lsb_release" ] && [ -x "$lsb_release" ]; then
+		lsb_release -a >> "$OUTPUT"
 	fi
 
-	if [ -x "$HWINF" ]; then
-		write_header "$HWINF --network_ctrl"
-		$HWINF --network_ctrl >> "$OUTPUT"
+	if [ -n "$hwinfo" ] && [ -x "$hwinfo" ]; then
+		write_header "$hwinfo --network_ctrl"
+		hwinfo --network_ctrl >> "$OUTPUT"
 	fi
 
-	if [ -x "$HWINF" ]; then
-		write_header "$HWINF --isapnp"
-		$HWINF --isapnp >> "$OUTPUT"
+	if [ -n "$hwinfo" ] && [ -x "$hwinfo" ]; then
+		write_header "$hwinfo --isapnp"
+		hwinfo --isapnp >> "$OUTPUT"
 	fi
 
 	write_header "PCI Devices"
-	if [ -x "$LSPCI" ]; then
-		$LSPCI -v >> "$OUTPUT"
+	if [ -n "$lspci" ] && [ -x "$lspci" ]; then
+		lspci -v >> "$OUTPUT"
 	fi
 
 	write_header "Network Interfaces (ifconfig)"
-	if [ -x "$IFCFG" ]; then
-		$IFCFG >> "$OUTPUT"
+	if [ -n "$ifconfig" ] && [ -x "$ifconfig" ]; then
+		ifconfig >> "$OUTPUT"
 	fi
 
 	write_header "Network Interfaces (ip addr)"
-	if [ -x "$IP" ]; then
-		$IP addr show >> "$OUTPUT"
+	if [ -n "$ip" ] && [ -x "$ip" ]; then
+		ip addr show >> "$OUTPUT"
 	fi
 
 	write_header "Kernel Routing Table (route)"
-	if [ -x "$ROUTE" ]; then
-		$ROUTE -n >> "$OUTPUT"
+	if [ -n "$route" ] && [ -x "$route" ]; then
+		route -n >> "$OUTPUT"
 	fi
 
 	write_header "Kernel Routing Table (ip route)"
-	if [ -x "$IP" ]; then
-		$IP route show >> "$OUTPUT"
+	if [ -n "$ip" ] && [ -x "$ip" ]; then
+		ip route show >> "$OUTPUT"
 	fi
 
 	write_header "Network Module Configuration $DRVCONF"
@@ -100,18 +101,18 @@ dump_info(){
 	fi
 
 	write_header "IP4 Firewall Configuration"
-	if [ -x "$IP4FW" ]; then
-		$IP4FW -L -n >> "$OUTPUT"
+	if [ -n "$iptables" ] && [ -x "$iptables" ]; then
+		iptables -L -n >> "$OUTPUT"
 	fi
 
 	write_header "IP6 Firewall Configuration"
-	if [ -x "$IP6FW" ]; then
-		$IP6FW -L -n >> "$OUTPUT"
+	if [ -n "$ip6tables" ] && [ -x "$ip6tables" ]; then
+		ip6tables -L -n >> "$OUTPUT"
 	fi
 
 	write_header "Network Stats"
-	if [ -x "$NETSTAT" ]; then
-		$NETSTAT -s >> "$OUTPUT"
+	if [ -n "$netstat" ] && [ -x "$netstat" ]; then
+		netstat -s >> "$OUTPUT"
 	fi
 
 	write_header "Network Tweaks via $SYSCTL"

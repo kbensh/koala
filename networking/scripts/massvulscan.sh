@@ -3,7 +3,6 @@
 # source: https://github.com/choupit0/MassVulScan/blob/master/MassVulScan.sh
 version="3.0.0"
 
-# POSIX replacement for readlink -f to get script directory
 # We enter the directory of $0 and print the working directory
 if [ -h "$0" ]; then
     # If $0 is a symlink, resolving it strictly in POSIX is complex without readlink -f.
@@ -14,10 +13,10 @@ else
 fi
 dir_name=$(cd "$script_dir" && pwd)
 
-source_installation="${dir_name}/sources/installation.sh"
-source_top_tcp="${dir_name}/sources/top-ports-tcp-1000.txt"
-source_top_udp="${dir_name}/sources/top-ports-udp-1000.txt"
-report_folder="${dir_name}/reports/"
+source_installation="$../sources/installation.sh"
+source_top_tcp="$../sources/top-ports-tcp-1000.txt"
+source_top_udp="$../sources/top-ports-udp-1000.txt"
+report_folder="$../outputs/"
 
 # ANSI Colors
 blue_color="\033[0;36m"

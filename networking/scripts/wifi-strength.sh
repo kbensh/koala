@@ -3,10 +3,6 @@
 # File name: wifi-strength.sh
 # Description: This script scans for "masters" and displays wifi signal strength
 # with a text-based bar graph.
-# Version 1.1v 09/7/2020
-# 2020 Bill Fahrenkrug - bill.fahrenkrug@gmail.com
-#
-# Script Dependency: POSIX shell and iw. No other package requirements.
 #
 # The SSID and signal strength are from iw output, others are
 # calculated like Quality and GOOD/BAD signal.
@@ -16,13 +12,14 @@
 #  iw scan command requires root access
 
 # Set Defaults
-strength_str='#'  # default pound sign
-bar_len='50'      # default 50
-bar_fill_char=' ' # default space
-num_lines=''      # number of lines to display
-scan=1            # scan for AP's
-passive=1         # scan type, default active scan
-scan_interval='5' # scan interval, default 5 seconds
+strength_str='#'                # default pound sign
+bar_len='50'                    # default 50
+bar_fill_char=' '               # default space
+num_lines=''                    # number of lines to display
+scan=1                          # scan for AP's
+passive=1                       # scan type, default active scan
+scan_interval='5'               # scan interval, default 5 seconds
+max_scans=${max_scans:-100}     # maximum number of scans before exit
 
 # Must provide the network interface, wlan0 for example
 if [ $# -lt 1 ]; then
@@ -68,6 +65,10 @@ parse_options() {
             filter="$2"
             shift 2
             ;;
+        -s)
+            max_scans="$2"
+            shift 2
+            ;;
         *)
             printf "\n\nInvalid option: %s\n\n" "$key"
             usage_txt
@@ -89,6 +90,7 @@ usage_txt() {
     printf "  -l\tLength of strength bar, range 1-100, Default 50\n"
     printf "  -a\tActive scan, default passive scan. (Active scan sends Beacon's)\n"
     printf "  -f\tFilter results, use extended grep pattern. Example: -f 'Whispering|MESH'\n"
+    printf "  -s\tMaximum number of scans before exit, default 100\n"
     printf "Example:\n"
     printf "  Scan for \"masters\" on interface wlan1;\n\n"
     printf "\t%s wlan1\n\n" "$script"
@@ -96,6 +98,8 @@ usage_txt() {
     printf "\t%s -l 10 wlan1\n\n" "$script"
     printf "  Monitor client connection on interface wlan1\n\n"
     printf "\t%s -m wlan1\n\n" "$script"
+    printf "  Run 50 scans then exit\n\n"
+    printf "\t%s -s 50 wlan1\n\n" "$script"
     printf "Interfaces found:\n"
     iw dev 2>/dev/null | grep "Interface" | awk '{print $2}'
     printf "\n\n"
@@ -295,11 +299,14 @@ if ! iw dev 2>/dev/null | grep "Interface $net" >/dev/null 2>&1; then
     exit
 fi
 
-# Loop until ctrl-C
-while true; do
+# Initialize scan counter
+scan_count=0
+
+# Loop until max_scans reached or ctrl-C
+while [ "$scan_count" -lt "$max_scans" ]; do
     if [ "$scan" = 1 ]; then
 
-        printf "\nPress ctrl-c to quit\n"
+        printf "\nScan %d/%d\n" "$((scan_count + 1))" "$max_scans"
         printf "Scanning on %s\n" "$net"
 
         if [ $passive -eq 1 ]; then
@@ -351,6 +358,9 @@ while true; do
         printf "\n%${header_width}s |%5s |%8s |%10s | %-17s | %-10s\n" "Signal" "dBm" "Quality" "Frequency" "BSSID" "SSID"
         # Parse the scan data
         printf "%s" "$scan_data" | parse_scan
+        
+        # Increment scan counter
+        scan_count=$((scan_count + 1))
     else
         rssi=$(iw dev "$net" link | grep signal || printf "%s" $?)
         if [ "$rssi" != "1" ]; then
@@ -358,6 +368,9 @@ while true; do
             get_header
             get_output "$(printf "%s" "$rssi" | awk '{print $2}')"
             sleep 2
+            
+            # Increment scan counter
+            scan_count=$((scan_count + 1))
         else
             printf "\n\Interface device %s not connected.\n" "$net"
             break
@@ -365,4 +378,5 @@ while true; do
     fi
 done
 
+printf "\n\nCompleted %d scans. Exiting.\n" "$scan_count"
 exit
