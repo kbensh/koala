@@ -58,13 +58,15 @@ if should_run "shnake"; then
     # Validate that the output file contains a '0'
     if [ -f "$SHNAKE_OUTPUT_FILE" ]; then
         if grep -q '0' "$SHNAKE_OUTPUT_FILE"; then
-            echo "OK: shnake"
+            echo "OK: shnake output match"
+            echo shnake 0
         else
-            echo "FAILED: shnake"
+            echo "FAILED: shnake output mismatch"
+            echo shnake 1
             validate_result=1
         fi
     else
-        echo "FAILED: shnake."
+        echo "FAILED: shnake output not found"
         validate_result=1
     fi
 fi
@@ -74,13 +76,16 @@ if should_run "shtris"; then
     # Validate that the output file contains a '0'
     if [ -f "$SHTRIS_OUTPUT_FILE" ]; then
         if grep -q '0' "$SHTRIS_OUTPUT_FILE"; then
-            echo "OK: shtris"
+            echo "OK: shtris output match"
+            echo shtris 0
         else
-            echo "FAILED: shtris"
+            echo "FAILED: shtris output mismatch"
+            echo shtris 1
             validate_result=1
         fi
     else
-        echo "FAILED: shtris."
+        echo "FAILED: shtris output not found"
+        echo shtris 1
         validate_result=1
     fi
 fi
@@ -101,34 +106,51 @@ if should_run "Miniforge3-Linux-x86_64" || should_run "miniforge"; then
         if "$CONDA_BIN" --version > /dev/null 2>&1; then
              VERSION=$("$CONDA_BIN" --version)
              echo "OK: Found $VERSION at $CONDA_BIN"
+             echo miniforge 0
         else
-             echo "FAILED: Conda binary found but execution failed."
+             echo "FAILED: Conda binary found but execution failed"
+             echo miniforge 0
              validate_result=1
         fi
     else
-        echo "FAILED: Could not find 'conda' binary in standard locations."
+        echo "FAILED: Could not find 'conda' binary in standard locations"
+        echo miniforge 1
         validate_result=1
     fi
 fi
 
 if should_run "ohmyzsh"; then
-    # The execute script exports ZSH to outputs_dir. 
-    # If run interactively without that export, it likely went to ~/.oh-my-zsh
-    EXPECTED_ZSH_DIR="$outputs_dir/ohmyzsh_install"
-    DEFAULT_ZSH_DIR="$HOME/.oh-my-zsh"
+    PATH_1="$outputs_dir/ohmyzsh"
+    PATH_2="$outputs_dir/ohmyzsh_install"
+    PATH_3="$HOME/.oh-my-zsh"
+    PATH_4="$input_dir/ohmyzsh"
 
-    if [ -f "$EXPECTED_ZSH_DIR/oh-my-zsh.sh" ]; then
-        echo "OK: Oh My Zsh found in output directory."
-    elif [ -f "$DEFAULT_ZSH_DIR/oh-my-zsh.sh" ]; then
-        echo "OK: Oh My Zsh found in default home directory."
-    else
-        echo "FAILED: oh-my-zsh.sh not found in $EXPECTED_ZSH_DIR or $DEFAULT_ZSH_DIR"
+    FOUND=0
+    for DIR in "$PATH_1" "$PATH_2" "$PATH_3" "$PATH_4"; do
+        if [ -f "$DIR/oh-my-zsh.sh" ]; then
+            echo "OK: Oh My Zsh found at $DIR"
+            echo ohmyzsh 0
+            FOUND=1
+            break
+        fi
+    done
+
+    if [ $FOUND -eq 0 ]; then
+        echo "FAILED: oh-my-zsh.sh not found."
+        echo "Checked locations:"
+        echo "  - $PATH_1"
+        echo "  - $PATH_2"
+        echo "  - $PATH_3"
+        echo "  - $PATH_4"
+        echo ohmyzsh 1
         validate_result=1
     fi
 fi
 
 if [ $validate_result -eq 0 ]; then
+    echo interactive 0
     exit 0
 else
+    echo interactive 1
     exit 1
 fi

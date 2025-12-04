@@ -14,14 +14,6 @@ REPO=${REPO:-ohmyzsh/ohmyzsh}
 REMOTE=${REMOTE:-https://github.com/${REPO}.git}
 BRANCH=${BRANCH:-master}
 
-command_exists() {
-  command -v "$@" >/dev/null 2>&1
-}
-
-fmt_error() {
-  printf 'Error: %s\n' "$*" >&2
-}
-
 download_ohmyzsh() {
   echo "Downloading Oh My Zsh to $ZSH_TARGET..."
 
@@ -49,7 +41,7 @@ download_ohmyzsh() {
       cd -
       rm -rf "$ZSH_TARGET" 2>/dev/null
     }
-    fmt_error "git clone of oh-my-zsh repo failed"
+    echo "git clone of oh-my-zsh repo failed"
     exit 1
   }
   cd -

@@ -2197,7 +2197,7 @@ quit() {
   running=false # let's stop controller ...
   xyprint $((CENTER_X - 5)) $CENTER_Y 'Game Over!'
   flush_screen
-  echo 0 >> $OUTPUT_FILE
+  echo 0 >> $SHTRIS_OUTPUT_FILE
 }
 
 init() {

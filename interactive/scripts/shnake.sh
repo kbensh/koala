@@ -14,6 +14,7 @@ OFFSET_X=1
 OFFSET_Y=2
 SCALE_X=2
 INPUT_FILE=$1
+TOP=$(git rev-parse --show-toplevel)
 SHNAKE_OUTPUT_FILE=${SHNAKE_OUTPUT_FILE:-"$TOP/interactive/shnake_output"}
 # POSIX trap allows catching signals
 trap quit INT TERM HUP
@@ -32,7 +33,7 @@ quit(){
         printf "$*"
     fi
     echo "You got a score of $score"
-    echo 0 >> $OUTPUT_FILE
+    echo 0 >> $SHNAKE_OUTPUT_FILE
     exit 0
 }
 
