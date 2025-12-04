@@ -12,11 +12,11 @@ else
     script_dir=$(dirname "$0")
 fi
 dir_name=$(cd "$script_dir" && pwd)
-
-source_installation="$../sources/installation.sh"
-source_top_tcp="$../sources/top-ports-tcp-1000.txt"
-source_top_udp="$../sources/top-ports-udp-1000.txt"
-report_folder="$../outputs/"
+TOP=$(git rev-parse --show-toplevel)
+source_installation="$TOP/networking/sources/installation.sh"
+source_top_tcp="$TOP/networking/sources/top-ports-tcp-1000.txt"
+source_top_udp="$TOP/networking/sources/top-ports-udp-1000.txt"
+report_folder="$TOP/networking/outputs/"
 
 # ANSI Colors
 blue_color="\033[0;36m"

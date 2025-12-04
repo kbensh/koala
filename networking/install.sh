@@ -1,15 +1,12 @@
-#!/bin/sh
-
-sudo apt-get update -y
-
-mkdir -p /etc/apt/keyrings
-curl -fsSL https://repo.charm.sh/apt/gpg.key | gpg --yes --dearmor -o /etc/apt/keyrings/charm.gpg
-echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | tee /etc/apt/sources.list.d/charm.list > /dev/null
+#!/bin/bash
 
 sudo apt-get update -y
 
 sudo apt-get install -y \
+    wget \
+    nmap \
     iproute2 \
+    iptables \
     build-essential \
     git \
     curl \
@@ -41,6 +38,13 @@ sudo apt-get install -y \
     python3-pip \
     python3-venv \
     postgresql libdnet-dev libpq-dev libpcap-dev bison flex
+
+sudo apt-get update -y
+
+mkdir -p /etc/apt/keyrings
+curl -fsSL https://repo.charm.sh/apt/gpg.key | gpg --yes --dearmor -o /etc/apt/keyrings/charm.gpg
+echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | tee /etc/apt/sources.list.d/charm.list > /dev/null
+
 
 if ! command -v unicornscan >/dev/null 2>&1; then
     wget http://sourceforge.net/projects/osace/files/unicornscan/unicornscan%20-%200.4.7%20source/unicornscan-0.4.7-2.tar.bz2/download -O unicornscan-0.4.7-2.tar.bz2

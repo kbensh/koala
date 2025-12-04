@@ -16,10 +16,12 @@ while [ $# -gt 0 ]; do
     case "$1" in
         --small)
             size=small
+            export max_scans=20
             shift
             ;;
         --min)
             size=min
+            export max_scans=5
             shift
             ;;
         -s|--scripts)
@@ -64,7 +66,7 @@ if should_run "accept-ips"; then
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/accept-ips.sh")"
     export BENCHMARK_SCRIPT
-    $KOALA_SHELL $scripts_dir/accept-ips.sh $input_dir/ips_$size.txt
+    sudo $KOALA_SHELL $scripts_dir/accept-ips.sh $input_dir/ips_$size.txt
     echo $?
 fi
 
@@ -75,7 +77,7 @@ if should_run "block-country-ips"; then
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/block-country-ips.sh")"
     export BENCHMARK_SCRIPT
-    $KOALA_SHELL $scripts_dir/block-country-ips.sh $input_dir/ips_$size.txt open dummy
+    sudo $KOALA_SHELL $scripts_dir/block-country-ips.sh $input_dir/ips_$size.txt open dummy
     echo $?
 fi
 
@@ -85,7 +87,7 @@ if should_run "get-ip"; then
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/get-ip.sh")"
     export BENCHMARK_SCRIPT
-    $KOALA_SHELL $scripts_dir/get-ip.sh
+    sudo $KOALA_SHELL $scripts_dir/get-ip.sh
     echo $?
 fi
 
@@ -95,7 +97,7 @@ if should_run "networkconf"; then
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/networkconf.sh")"
     export BENCHMARK_SCRIPT
-    $KOALA_SHELL $scripts_dir/networkconf.sh
+    sudo $KOALA_SHELL $scripts_dir/networkconf.sh
     echo $?
 fi
 
@@ -105,7 +107,7 @@ if should_run "pingsweep"; then
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/pingsweep.sh")"
     export BENCHMARK_SCRIPT
-    $KOALA_SHELL $scripts_dir/pingsweep.sh
+    sudo $KOALA_SHELL $scripts_dir/pingsweep.sh
     echo $?
 fi
 
@@ -115,7 +117,7 @@ if should_run "ssh-ips"; then
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/ssh-ips.sh")"
     export BENCHMARK_SCRIPT
-    $KOALA_SHELL $scripts_dir/ssh-ips.sh "$input_dir/ips_ssh_$size.txt"
+    sudo $KOALA_SHELL $scripts_dir/ssh-ips.sh "$input_dir/ips_ssh_$size.txt"
     echo $?
 fi
 
@@ -137,7 +139,7 @@ if should_run "onetwopunch"; then
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/onetwopunch.sh")"
     export BENCHMARK_SCRIPT
-    $KOALA_SHELL $scripts_dir/onetwopunch.sh -t localhost.txt -i lo -p all
+    sudo $KOALA_SHELL $scripts_dir/onetwopunch.sh -t localhost.txt -i lo -p all
     echo $?
 fi
 
