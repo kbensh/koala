@@ -9,4 +9,4 @@ cd "$(realpath "$(dirname "$0")")" || exit 1
 cd utils
 python3 create_ips.py
 python3 create_ssh_ips.py
-$KOALA_SHELL "mock_iw.sh"
+echo 127.0.0.1 >> $input_dir/localhost.txt

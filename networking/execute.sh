@@ -117,7 +117,7 @@ if should_run "ssh-ips"; then
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/ssh-ips.sh")"
     export BENCHMARK_SCRIPT
-    sudo $KOALA_SHELL $scripts_dir/ssh-ips.sh "$input_dir/ips_ssh_$size.txt"
+    sudo $KOALA_SHELL $scripts_dir/ssh-ips.sh open "$input_dir/ips_ssh_$size.txt"
     echo $?
 fi
 
@@ -139,7 +139,7 @@ if should_run "onetwopunch"; then
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/onetwopunch.sh")"
     export BENCHMARK_SCRIPT
-    sudo $KOALA_SHELL $scripts_dir/onetwopunch.sh -t localhost.txt -i lo -p all
+    sudo $KOALA_SHELL $scripts_dir/onetwopunch.sh -t $input_dir/localhost.txt -i lo -p all
     echo $?
 fi
 
@@ -150,7 +150,7 @@ if should_run "massvulscan"; then
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/massvulscan.sh")"
     export BENCHMARK_SCRIPT
-    sudo $KOALA_SHELL $scripts_dir/massvulscan.sh -a -f localhost.txt
+    sudo $KOALA_SHELL $scripts_dir/massvulscan.sh -a -f $input_dir/localhost.txt
     echo $?
 fi
 

@@ -1,79 +1,108 @@
 #!/bin/bash
 
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --yes --dearmor -o /etc/apt/keyrings/charm.gpg
+echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list
+
 sudo apt-get update -y
 
 sudo apt-get install -y \
-    wget \
-    nmap \
-    iproute2 \
-    iptables \
     build-essential \
     git \
     curl \
     wget \
     gpg \
+    automake \
+    flex \
     tar \
+    libpq-dev \
     libpcre3-dev \
     libssl-dev \
     libpcap-dev \
+    libltdl-dev \
+    bison \
+    python3 \
+    python3-pip \
+    python3-venv \
     net-tools \
     xsltproc \
     bind9-dnsutils \
+    gum \
     netcat-traditional \
     toilet \
-    boxes \
-    lolcat \
-    automake \
+    boxes
+
+sudo apt-get install -y \
     nmap \
     lolcat \
     toilet \
     boxes \
     masscan \
-    gum \
     bind9-host \
     geoip-bin \
     hwinfo \
     autoconf \
-    python3 \
-    python3-pip \
-    python3-venv \
-    postgresql libdnet-dev libpq-dev libpcap-dev bison flex
+    iproute2 \
+    iptables \
+    ipset \
+    masscan \
+    postgresql \
+    postgresql-contrib \
+    check
 
-sudo apt-get update -y
+cd /tmp
 
-mkdir -p /etc/apt/keyrings
-curl -fsSL https://repo.charm.sh/apt/gpg.key | gpg --yes --dearmor -o /etc/apt/keyrings/charm.gpg
-echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | tee /etc/apt/sources.list.d/charm.list > /dev/null
+echo "Adding kali repository to apt sources"
+sudo touch /etc/apt/sources.list.d/kali.list
+sudo chmod 666 /etc/apt/sources.list.d/kali.list
+sudo echo 'deb https://http.kali.org/kali kali-rolling main non-free contrib' > /etc/apt/sources.list.d/kali.list
+sudo chmod 644 /etc/apt/sources.list.d/kali.list
+sudo apt install gnupg
+wget 'https://archive.kali.org/archive-key.asc'
+sudo apt-key add archive-key.asc
+rm archive-key.asc
+echo "Setting low priority for kali repository"
+sudo touch /etc/apt/preferences.d/kali.pref
+sudo chmod 666 /etc/apt/preferences.d/kali.pref 
+echo 'Package: *'>/etc/apt/preferences.d/kali.pref
+echo 'Pin: release a=kali-rolling'>>/etc/apt/preferences.d/kali.pref
+echo 'Pin-Priority: 50'>>/etc/apt/preferences.d/kali.pref
+sudo chmod 644 /etc/apt/preferences.d/kali.pref
 
+cd /tmp
+git clone https://github.com/ofalk/libdnet
+cd libdnet
+./configure
+make
+sudo make install
+cd /tmp
 
-if ! command -v unicornscan >/dev/null 2>&1; then
-    wget http://sourceforge.net/projects/osace/files/unicornscan/unicornscan%20-%200.4.7%20source/unicornscan-0.4.7-2.tar.bz2/download -O unicornscan-0.4.7-2.tar.bz2
-    tar jxvf unicornscan-0.4.7-2.tar.bz2
-    cd unicornscan-0.4.7/
-    ./configure CFLAGS=-D_GNU_SOURCE
-    make
-    sudo make install
+sudo apt-get install unicornscan -t kali-rolling
+
+service postgresql start
+sleep 3
+if ! sudo -u postgres psql -t -c '\du' | cut -d \| -f 1 | grep -qw unicorn; then
+    echo "Creating PostgreSQL user 'unicorn'..."
+    sudo -u postgres createuser -S -D -R unicorn
+else
+    echo "User 'unicorn' already exists."
 fi
+
+if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -qw unicornscan; then
+    echo "Creating 'unicornscan' database..."
+    sudo -u postgres createdb -O unicorn unicornscan
+else
+    echo "Database 'unicornscan' already exists."
+fi
+
+
 # Install Masscan
 if ! command -v masscan >/dev/null 2>&1; then
     cd /tmp
-    git clone https://gitlab.com/kalilinux/packages/unicornscan
-    cd unicornscan
-    ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --enable-bundled-ltdl
+    git clone https://github.com/robertdavidgraham/masscan
+    cd masscan
     make -j"$(nproc)"
-    make install
-fi
-
-# Install Nmap
-if ! command -v nmap >/dev/null 2>&1; then
-    cd /tmp
-    rm -rf nmap-7.95
-    wget https://nmap.org/dist/nmap-7.95.tar.bz2
-    tar xvjf nmap-7.95.tar.bz2
-    cd nmap-7.95
-    ./configure --without-zenmap --without-nping --without-ndiff --without-ncat
-    make -j"$(nproc)"
-    make install
+    sudo make install
 fi
 
 # Update locate database if available

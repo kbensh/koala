@@ -20,7 +20,6 @@ scan=1                          # scan for AP's
 passive=1                       # scan type, default active scan
 scan_interval='5'               # scan interval, default 5 seconds
 max_scans=${max_scans:-100}     # maximum number of scans before exit
-
 # Must provide the network interface, wlan0 for example
 if [ $# -lt 1 ]; then
     printf "\n Usage: \"%s [options] [interface]\"\n -- for example;\n" "$(basename -- "$0")"

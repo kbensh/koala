@@ -154,29 +154,31 @@ checking_prerequisites(){
     if [ ! -f "${nmap_scripts_folder}vulners.nse" ]; then
          missing_or_outdated_packages="$missing_or_outdated_packages vulners"
     fi
-
+    echo $missing_or_outdated_packages
+    count=$(echo "$missing_or_outdated_packages" | wc -w)
+    echo $count
     # Installation if missing
     # In POSIX, we check if string is not empty
-    if [ -n "$missing_or_outdated_packages" ]; then
-        # Count items by counting words
-        count=$(echo "$missing_or_outdated_packages" | wc -w)
+    # if [ -n "$missing_or_outdated_packages" ]; then
+    #     # Count items by counting words
+    #     count=$(echo "$missing_or_outdated_packages" | wc -w)
         
-        printf "${bold_color}${red_color}Some prerequisites are missing or outdated ($count):${end_color}\n"
-        printf "${blue_color}${missing_or_outdated_packages}${end_color}\n"
+    #     printf "${bold_color}${red_color}Some prerequisites are missing or outdated ($count):${end_color}\n"
+    #     printf "${blue_color}${missing_or_outdated_packages}${end_color}\n"
         
-        export packages_to_install="$missing_or_outdated_packages"
-        export nmap_scripts_folder
-        export os_family
+    #     export packages_to_install="$missing_or_outdated_packages"
+    #     export nmap_scripts_folder
+    #     export os_family
         
-        if [ ! -s "${source_installation}" ]; then
-            printf "${red_color}Missing installation source file: ${source_installation}. Please re-clone repository.${end_color}\n"
-            exit 1
-        fi
-        # Use dot for sourcing
-        . "${source_installation}"
-    else
-        touch "${dir_name}/.prerequisites_already_installed" 2>/dev/null
-    fi
+    #     if [ ! -s "${source_installation}" ]; then
+    #         printf "${red_color}Missing installation source file: ${source_installation}. Please re-clone repository.${end_color}\n"
+    #         exit 1
+    #     fi
+    #     # Use dot for sourcing
+    #     . "${source_installation}"
+    # else
+    #     touch "${dir_name}/.prerequisites_already_installed" 2>/dev/null
+    # fi
 }
 
 if [ ! -f "${dir_name}/.prerequisites_already_installed" ]; then
