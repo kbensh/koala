@@ -126,19 +126,27 @@ sudo apt-get update
 sudo apt-get install -y openssh-server
 sudo apt-get install -y openssh-client
 
-echo ""
-echo "Starting SSH service..."
-if command -v systemctl >/dev/null 2>&1; then
-    systemctl start ssh || systemctl start sshd
-    systemctl enable ssh || systemctl enable sshd
-elif command -v service >/dev/null 2>&1; then
-    service ssh start || service sshd start
-else
-    # In Docker, start manually
-    /usr/sbin/sshd
+# If not root, re-execute the script as root
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Re-running as root..."
+    sudo "$0" "$@"
+    exit $?
 fi
 
-# Generate SSH key if it doesn't exist
+# Start SSH service if not running
+echo "Starting SSH service..."
+if command -v systemctl >/dev/null 2>&1; then
+    systemctl start ssh 2>/dev/null || systemctl start sshd 2>/dev/null
+    systemctl enable ssh 2>/dev/null || systemctl enable sshd 2>/dev/null
+elif command -v service >/dev/null 2>&1; then
+    service ssh start 2>/dev/null || service sshd start 2>/dev/null
+else
+    # In Docker, start manually if sshd exists
+    if [ -f /usr/sbin/sshd ]; then
+        /usr/sbin/sshd
+    fi
+fi
+
 CURRENT_USER=$(whoami)
 SSH_DIR="$HOME/.ssh"
 KEY_FILE="$SSH_DIR/id_rsa_ip_ssh"
@@ -154,9 +162,9 @@ fi
 if [ ! -f "$KEY_FILE" ]; then
     echo "Generating SSH key..."
     ssh-keygen -t rsa -b 2048 -f "$KEY_FILE" -N "" -q
-    echo "SSH key generated"
+    echo "SSH key generated at $KEY_FILE"
 else
-    echo "SSH key already exists"
+    echo "SSH key already exists at $KEY_FILE"
 fi
 
 AUTH_KEYS="$SSH_DIR/authorized_keys"
@@ -174,3 +182,7 @@ if ! grep -q "$(cat ${KEY_FILE}.pub)" "$AUTH_KEYS" 2>/dev/null; then
 else
     echo "Key already in authorized_keys"
 fi
+
+echo ""
+echo "Setup complete!"
+echo "SSH key location: $KEY_FILE"

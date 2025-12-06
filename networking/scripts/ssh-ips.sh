@@ -1,9 +1,12 @@
 #!/bin/sh
 
 # testing on ourselves
-CURRENT_USER=$(whoami) 
-LOCALHOST="localhost" 
-
+usr=$(whoami)
+CURRENT_USER="${1:-usr}"
+LOCALHOST="${2:-localhost}" 
+ACTION=$3
+FILE=$4
+OUTPUT_FILE="${5:-firewall_output.txt}"
 # Function: Add an IP over ssh to localhost
 remoteipadd(){
     client=$(echo "$1" | cut -d':' -f1)
@@ -11,9 +14,9 @@ remoteipadd(){
     wallif=$(echo "$1" | cut -d':' -f3)
     ip=$(echo "$1" | cut -d':' -f4)
     output_file="$2"
-    
+
     echo " [OPENING] Port $port for $client on $LOCALHOST (via SSH as $CURRENT_USER)..."
-    ssh -n ${CURRENT_USER}@${LOCALHOST} /sbin/iptables -I INPUT -i ${wallif} -s ${client} -d ${ip} -p tcp --destination-port ${port} -j ACCEPT >> "$output_file" 2>&1
+    ssh -i "$HOME/.ssh/id_rsa_ip_ssh" -n ${CURRENT_USER}@${LOCALHOST} /sbin/iptables -I INPUT -i ${wallif} -s ${client} -d ${ip} -p tcp --destination-port ${port} -j ACCEPT >> "$output_file" 2>&1
 }
 
 # Function: Delete an IP over ssh from localhost
@@ -23,9 +26,9 @@ remoteipdelete(){
     wallif=$(echo "$1" | cut -d':' -f3)
     ip=$(echo "$1" | cut -d':' -f4)
     output_file="$2"
-    
+
     echo " [CLOSING] Port $port for $client on $LOCALHOST (via SSH as $CURRENT_USER)..."
-    ssh -n ${CURRENT_USER}@${LOCALHOST} /sbin/iptables -D INPUT -i ${wallif} -s ${client} -d ${ip} -p tcp --destination-port ${port} -j ACCEPT >> "$output_file" 2>&1
+    ssh -i "$HOME/.ssh/id_rsa_ip_ssh" -n ${CURRENT_USER}@${LOCALHOST} /sbin/iptables -D INPUT -i ${wallif} -s ${client} -d ${ip} -p tcp --destination-port ${port} -j ACCEPT >> "$output_file" 2>&1
 }
 
 usage(){
@@ -40,10 +43,6 @@ usage(){
 if [ $# -lt 2 ]; then
     usage
 fi
-
-ACTION=$1
-FILE=$2
-OUTPUT_FILE="${3:-firewall_output.txt}"
 
 if [ "$ACTION" != "open" ] && [ "$ACTION" != "close" ]; then
     echo "Error: Action must be 'open' or 'close'"
