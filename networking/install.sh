@@ -119,7 +119,7 @@ fi
 
 mkdir -p "${nmap_scripts_folder}"
 wget -q https://raw.githubusercontent.com/vulnersCom/nmap-vulners/master/vulners.nse -O "${nmap_scripts_folder}vulners.nse" &>> "${log_file}"
-nmap --script-updatedb
+sudo nmap --script-updatedb
 
 # Check if SSH server is installed
 sudo apt-get update
