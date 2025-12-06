@@ -1,12 +1,15 @@
 #!/bin/sh
 
-# testing on ourselves
+# Get current user
 usr=$(whoami)
-CURRENT_USER="${1:-usr}"
+
+# Parse arguments
+CURRENT_USER="${1:-$usr}"
 LOCALHOST="${2:-localhost}" 
-ACTION=$3
-FILE=$4
+ACTION="$3"
+FILE="$4"
 OUTPUT_FILE="${5:-firewall_output.txt}"
+
 # Function: Add an IP over ssh to localhost
 remoteipadd(){
     client=$(echo "$1" | cut -d':' -f1)
@@ -32,13 +35,27 @@ remoteipdelete(){
 }
 
 usage(){
-    echo "Usage: $0 {open|close} filename.txt [output_file]"
-    echo "Example: $0 open rules.txt firewall_output.txt"
+    echo "Usage: $0 [user] [host] {open|close} filename.txt [output_file]"
+    echo "Example: $0 root localhost open rules.txt firewall_output.txt"
+    echo "Example: $0 open rules.txt  # Uses current user and localhost"
     echo ""
-    echo "This script will SSH to localhost as $CURRENT_USER"
-    echo "If output_file is not specified, defaults to firewall_output.txt"
+    echo "Arguments:"
+    echo "  user        - SSH user (default: current user '$usr')"
+    echo "  host        - SSH host (default: localhost)"
+    echo "  action      - 'open' or 'close'"
+    echo "  filename    - File containing firewall rules"
+    echo "  output_file - Output file (default: firewall_output.txt)"
     exit 1
 }
+
+# Handle case where user provides action directly (backward compatibility)
+if [ "$1" = "open" ] || [ "$1" = "close" ]; then
+    CURRENT_USER="$usr"
+    LOCALHOST="localhost"
+    ACTION="$1"
+    FILE="$2"
+    OUTPUT_FILE="${3:-firewall_output.txt}"
+fi
 
 if [ $# -lt 2 ]; then
     usage

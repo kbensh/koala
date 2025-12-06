@@ -135,7 +135,7 @@ if should_run "ssh-ips"; then
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/ssh-ips.sh")"
     export BENCHMARK_SCRIPT
-    $KOALA_SHELL "root" "localhost" "$scripts_dir/ssh-ips.sh" "open" "$input_dir/ips_ssh_$size.txt"
+    $KOALA_SHELL root localhost open "$input_dir/ips_ssh_$size.txt"
     echo $?
 fi
 
