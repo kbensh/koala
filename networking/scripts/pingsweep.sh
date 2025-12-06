@@ -1,11 +1,12 @@
 #!/bin/bash
 # https://github.com/CYBWithFlourish/IP-Sweeper-Script/blob/main/ip_sweeper.sh
 SUBNET="127.0.0"
+OUTPUT_FILE="${1:-ip_sweeper_output.txt}"
 
 echo "Pinging subnet $SUBNET.0/24..."
 
 for ip in $(seq 1 254); do
-    if ping -c 1 -W 1 $SUBNET.$ip > /dev/null 2>&1; then
-        echo "Host $SUBNET.$ip is UP"
+    if ping -c 1 -W 1 $SUBNET.$ip >> "$OUTPUT_FILE" 2>&1; then
+        echo "Host $SUBNET.$ip is UP" >> "$OUTPUT_FILE" 2>&1
     fi
 done

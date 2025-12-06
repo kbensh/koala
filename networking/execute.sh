@@ -59,25 +59,23 @@ should_run() {
     return 1
 }
 
-# accept-ips benchmark
 if should_run "accept-ips"; then
     echo "accept-ips"
     BENCHMARK_INPUT_FILE="$input_dir/ips_$size.txt"
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/accept-ips.sh")"
     export BENCHMARK_SCRIPT
-    sudo $KOALA_SHELL $scripts_dir/accept-ips.sh $input_dir/ips_$size.txt
+    sudo $KOALA_SHELL $scripts_dir/accept-ips.sh $input_dir/ips_$size.txt $outputs_dir/accept-ips_$size.txt
     echo $?
 fi
 
-# block-country-ips benchmark
 if should_run "block-country-ips"; then
     echo "block-country-ips"
     BENCHMARK_INPUT_FILE="$input_dir/ips_$size.txt"
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/block-country-ips.sh")"
     export BENCHMARK_SCRIPT
-    sudo $KOALA_SHELL $scripts_dir/block-country-ips.sh $input_dir/ips_$size.txt open dummy
+    sudo $KOALA_SHELL $scripts_dir/block-country-ips.sh $input_dir/ips_$size.txt $outputs_dir/block-country-ips_$size.txt open dummy
     echo $?
 fi
 
@@ -87,7 +85,17 @@ if should_run "get-ip"; then
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/get-ip.sh")"
     export BENCHMARK_SCRIPT
-    sudo $KOALA_SHELL $scripts_dir/get-ip.sh
+    sudo $KOALA_SHELL $scripts_dir/get-ip.sh $outputs_dir/get-ip.txt
+    echo $?
+fi
+
+if should_run "massvulscan"; then
+    echo "massvulscan"
+    BENCHMARK_INPUT_FILE="$input_dir/localhost.txt"
+    export BENCHMARK_INPUT_FILE
+    BENCHMARK_SCRIPT="$(realpath "$scripts_dir/massvulscan.sh")"
+    export BENCHMARK_SCRIPT
+    sudo $KOALA_SHELL $scripts_dir/massvulscan.sh -a -f $input_dir/localhost.txt
     echo $?
 fi
 
@@ -97,7 +105,17 @@ if should_run "networkconf"; then
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/networkconf.sh")"
     export BENCHMARK_SCRIPT
-    sudo $KOALA_SHELL $scripts_dir/networkconf.sh
+    sudo $KOALA_SHELL $scripts_dir/networkconf.sh $outputs_dir/networkconf.txt
+    echo $?
+fi
+
+if should_run "onetwopunch"; then
+    echo "onetwopunch"
+    BENCHMARK_INPUT_FILE="$input_dir/localhost.txt"
+    export BENCHMARK_INPUT_FILE
+    BENCHMARK_SCRIPT="$(realpath "$scripts_dir/onetwopunch.sh")"
+    export BENCHMARK_SCRIPT
+    sudo $KOALA_SHELL $scripts_dir/onetwopunch.sh -t $input_dir/localhost.txt -i lo -p all -o $outputs_dir/onetwopunch
     echo $?
 fi
 
@@ -107,7 +125,7 @@ if should_run "pingsweep"; then
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/pingsweep.sh")"
     export BENCHMARK_SCRIPT
-    sudo $KOALA_SHELL $scripts_dir/pingsweep.sh
+    sudo $KOALA_SHELL $scripts_dir/pingsweep.sh $outputs_dir/pingsweep.txt
     echo $?
 fi
 
@@ -121,37 +139,5 @@ if should_run "ssh-ips"; then
     echo $?
 fi
 
-if should_run "wifi-strength"; then
-    echo "wifi-strength"
-    BENCHMARK_INPUT_FILE=""
-    export BENCHMARK_INPUT_FILE
-    BENCHMARK_SCRIPT="$(realpath "$scripts_dir/wifi-strength.sh")"
-    export BENCHMARK_SCRIPT
-    sudo $KOALA_SHELL $scripts_dir/wifi-strength.sh wlan0
-    echo $?
-fi
-
-
-# onetwopunch benchmark
-if should_run "onetwopunch"; then
-    echo "onetwopunch"
-    BENCHMARK_INPUT_FILE="$input_dir/localhost.txt"
-    export BENCHMARK_INPUT_FILE
-    BENCHMARK_SCRIPT="$(realpath "$scripts_dir/onetwopunch.sh")"
-    export BENCHMARK_SCRIPT
-    sudo $KOALA_SHELL $scripts_dir/onetwopunch.sh -t $input_dir/localhost.txt -i lo -p all
-    echo $?
-fi
-
-# massvulscan benchmark
-if should_run "massvulscan"; then
-    echo "massvulscan"
-    BENCHMARK_INPUT_FILE="$input_dir/localhost.txt"
-    export BENCHMARK_INPUT_FILE
-    BENCHMARK_SCRIPT="$(realpath "$scripts_dir/massvulscan.sh")"
-    export BENCHMARK_SCRIPT
-    sudo $KOALA_SHELL $scripts_dir/massvulscan.sh -a -f $input_dir/localhost.txt
-    echo $?
-fi
 
 

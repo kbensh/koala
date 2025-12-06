@@ -17,7 +17,7 @@ ip6tables=$(command -v ip6tables)
 netstat=$(command -v netstat)
 
 ## Output file ##
-OUTPUT="networkconf.txt"
+OUTPUT="${1:-networkconf.txt}"
 
 chk_root(){
 	meid=$(id -u)

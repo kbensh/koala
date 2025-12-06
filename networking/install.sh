@@ -77,6 +77,7 @@ make
 sudo make install
 cd /tmp
 
+sudo apt-get update -y
 sudo apt-get install unicornscan -t kali-rolling
 
 service postgresql start
@@ -106,9 +107,7 @@ if ! command -v masscan >/dev/null 2>&1; then
 fi
 
 # Update locate database if available
-if command -v updatedb >/dev/null 2>&1; then
-    updatedb || true
-fi
+sudo updatedb || true
 
 # Install Vulners NSE script
 echo -e "${blue_color}[-] Installing Vulners NSE script...${end_color}"

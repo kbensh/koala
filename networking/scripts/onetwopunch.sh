@@ -8,12 +8,13 @@ GREEN="${ESC}32m"
 BLUE="${ESC}34m"
 
 usage() {
-    printf "Usage: %s -t targets.txt [-p tcp/udp/all] [-i interface] [-n nmap-options] [-h]\n" "$0"
+    printf "Usage: %s -t targets.txt [-p tcp/udp/all] [-i interface] [-n nmap-options] [-o output-dir] [-h]\n" "$0"
     printf "       -h: Help\n"
     printf "       -t: File containing ip addresses to scan. This option is required.\n"
     printf "       -p: Protocol. Defaults to tcp\n"
     printf "       -i: Network interface. Defaults to eth0\n"
     printf "       -n: NMAP options (-A, -O, etc). Defaults to no options.\n"
+    printf "       -o: Output directory. Defaults to ~/.onetwopunch\n"
 }
 
 
@@ -42,13 +43,15 @@ proto="tcp"
 iface="eth0"
 nmap_opt="-sV"
 targets=""
+log_dir="${HOME}/.onetwopunch"
 
-while getopts "p:i:t:n:h" OPT; do
+while getopts "p:i:t:n:o:h" OPT; do
     case $OPT in
         p) proto="$OPTARG";;
         i) iface="$OPTARG";;
         t) targets="$OPTARG";;
         n) nmap_opt="$OPTARG";;
+        o) log_dir="$OPTARG";;
         h) usage; exit 0;;
         *) usage; exit 0;;
     esac
@@ -72,7 +75,6 @@ printf "%b[+]%b Nmap opts: %s\n" "$BLUE" "$RESET" "$nmap_opt"
 printf "%b[+]%b Targets  : %s\n" "$BLUE" "$RESET" "$targets"
 
 # backup any old scans before we start a new one
-log_dir="${HOME}/.onetwopunch"
 mkdir -p "${log_dir}/backup/"
 if [ -d "${log_dir}/ndir/" ]; then 
     mv "${log_dir}/ndir/" "${log_dir}/backup/ndir-$(date "+%Y%m%d-%H%M%S")/"
