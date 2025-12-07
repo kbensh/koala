@@ -118,20 +118,13 @@ else
 fi
 
 mkdir -p "${nmap_scripts_folder}"
-wget -q https://raw.githubusercontent.com/vulnersCom/nmap-vulners/master/vulners.nse -O "${nmap_scripts_folder}vulners.nse" &>> "${log_file}"
+wget -q https://raw.githubusercontent.com/vulnersCom/nmap-vulners/master/vulners.nse -O "${nmap_scripts_folder}vulners.nse"
 sudo nmap --script-updatedb
 
 # Check if SSH server is installed
 sudo apt-get update
 sudo apt-get install -y openssh-server
 sudo apt-get install -y openssh-client
-
-# If not root, re-execute the script as root
-if [ "$(id -u)" -ne 0 ]; then
-    echo "Re-running as root..."
-    sudo "$0" "$@"
-    exit $?
-fi
 
 # Start SSH service if not running
 echo "Starting SSH service..."
