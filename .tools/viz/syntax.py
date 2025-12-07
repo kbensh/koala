@@ -113,11 +113,9 @@ def node_heatmap(df, outdir=None):
 
     heatmap_data = heatmap_data.fillna(0)
     limit = 5
+    # create annotations before capping values then cap the values for display
+    annot_data = heatmap_data.applymap(lambda x: '*' if x > limit else '')
     heatmap_data = heatmap_data.applymap(lambda x: min(x, limit))
-    annot_data = heatmap_data.applymap(lambda x: \
-        #'>{}'.format(limit) \
-        '*' \
-            if x == limit else '')
     
     # order the y-axis of the heatmap according to the node_order, any nodes not in that list can appear after in any order
     heatmap_data = heatmap_data.loc[[x for x in heatmap_data.index if x not in node_order] + list(reversed(node_order))]
@@ -133,13 +131,10 @@ def node_heatmap(df, outdir=None):
     annot_data = annot_data[cols_sorted]
     # Add an overall total column, this should be outside the normalizations
     heatmap_data['ALL'] = heatmap_data.sum(axis=1)
-    annot_data['ALL'] = annot_data.sum(axis=1)
-
-    heatmap_data = heatmap_data.applymap(lambda x: min(x, limit))
-    annot_data = heatmap_data.applymap(lambda x: \
-        #'>{}'.format(limit) \
-        '*' \
-            if x == limit else '')
+    # Create annotation for the ALL column
+    annot_data['ALL'] = heatmap_data['ALL'].apply(lambda x: '*' if x > limit else '')
+    # Cap the ALL column values for display
+    heatmap_data['ALL'] = heatmap_data['ALL'].apply(lambda x: min(x, limit))
 
     # Set the color limit to be 5
     
@@ -184,8 +179,8 @@ def merge_node_counts(series):
 def read_data(merge_commands=True):
     df = pd.read_csv(data_path, header=None)
     df.columns = ['script', 'nodes']
-    # Unpack node counts
-    df['nodes'] = df['nodes'].apply(lambda x: dict([tuple(i.split(':')) for i in x.split(';')]) if isinstance(x, str) else {})
+    # Unpack node counts (use rsplit(':', 1) to split from the right, handling colons in command names like command(:))
+    df['nodes'] = df['nodes'].apply(lambda x: dict([tuple(i.rsplit(':', 1)) for i in x.split(';')]) if isinstance(x, str) else {})
     # Transform nodes entries for 'command(eval)' and 'command(alias)' into 'eval' and 'alias'
     df['nodes'] = df['nodes'].apply(lambda x: {extract_special_command(k): int(v) for k, v in x.items()})
     if merge_commands:
