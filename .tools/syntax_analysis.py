@@ -10,6 +10,8 @@ from dataclasses import dataclass
 import operator
 from collections import Counter
 import sys
+import tempfile
+import os
 import libdash
 import functools as ft
 from shasta.json_to_ast import to_ast_node
@@ -48,16 +50,48 @@ sys.setrecursionlimit (9001)
 NodeWSource = namedtuple('NodeWSource', ['node', 'source_syntax', 'linum_before', 'linum'])
 
 first_time = True
+
 def parse_shell_script(path):
     global first_time
-    path = str(path) # handle both str and pathlib.Path
-    raw_asts = libdash.parse(path, first_time)
-    first_time = False
-    return [NodeWSource(to_ast_node(raw_ast),
-                        source,
-                        linum_before,
-                        linum)
-               for (raw_ast, source, linum_before, linum) in raw_asts]
+    path = str(path)
+    
+    try:
+        raw_asts = libdash.parse(path, first_time)
+        first_time = False
+        return [NodeWSource(to_ast_node(raw_ast),
+                            source,
+                            linum_before,
+                            linum)
+                   for (raw_ast, source, linum_before, linum) in raw_asts]
+        
+    except UnicodeDecodeError:
+        with open(path, 'rb') as f:
+            raw_data = f.read()
+
+        clean_content = raw_data.decode('utf-8', errors='ignore')
+        
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.sh', delete=False) as tmp:
+            tmp.write(clean_content)
+            tmp_path = tmp.name
+            
+        try:
+            raw_asts = libdash.parse(tmp_path, first_time)
+            first_time = False
+            return [NodeWSource(to_ast_node(raw_ast),
+                                source,
+                                linum_before,
+                                linum)
+                       for (raw_ast, source, linum_before, linum) in raw_asts]
+        except Exception as e:
+            print(f"Failed to parse sanitized version of {path}: {e}", file=sys.stderr)
+            return []
+        finally:
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
+
+    except Exception as e:
+        print(f"Error processing {path}: {e}", file=sys.stderr)
+        return []
 
 class NodeVariant(StrEnum):
     """
