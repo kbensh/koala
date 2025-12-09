@@ -21,6 +21,7 @@ if [ "$RUN_IN_NAMESPACE" -eq 1 ]; then
     cleanup_namespace() {
         echo ""
         echo "Cleaning up network namespace..."
+        sudo iptables -t nat -D POSTROUTING -s 10.200.1.0/24 ! -d 10.200.1.0/24 -j MASQUERADE 2>/dev/null || true
         sudo ip netns delete "$NETNS_NAME" 2>/dev/null || true
         sudo ip link delete "$VETH_HOST" 2>/dev/null || true
         echo "Namespace cleaned up"
@@ -52,7 +53,7 @@ if [ "$RUN_IN_NAMESPACE" -eq 1 ]; then
 
     # Enable forwarding on host
     sudo bash -c 'echo 1 > /proc/sys/net/ipv4/ip_forward' 2>/dev/null || true
-
+    sudo iptables -t nat -A POSTROUTING -s 10.200.1.0/24 ! -d 10.200.1.0/24 -j MASQUERADE
     # Re-execute this script inside the namespace
     # We're entering as root, so we're root inside the namespace
     export KOALA_NETNS_ACTIVE=1
@@ -194,11 +195,10 @@ fi
 
 if should_run "pingsweep"; then
     echo "pingsweep"
-    BENCHMARK_INPUT_FILE=""
-    export BENCHMARK_INPUT_FILE
+    export BENCHMARK_INPUT_FILE="$input_dir/gateway_target.txt"
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/pingsweep.sh")"
     export BENCHMARK_SCRIPT
-    $KOALA_SHELL $scripts_dir/pingsweep.sh $outputs_dir/pingsweep.txt
+    $KOALA_SHELL $scripts_dir/pingsweep.sh 10.200.1 $outputs_dir/pingsweep.txt
     echo $?
 fi
 

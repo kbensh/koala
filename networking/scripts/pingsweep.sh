@@ -1,7 +1,7 @@
 #!/bin/bash
 # https://github.com/CYBWithFlourish/IP-Sweeper-Script/blob/main/ip_sweeper.sh
-SUBNET="127.0.0"
-OUTPUT_FILE="${1:-ip_sweeper_output.txt}"
+SUBNET="$1"
+OUTPUT_FILE="${2:-ip_sweeper_output.txt}"
 
 echo "Pinging subnet $SUBNET.0/24..."
 
