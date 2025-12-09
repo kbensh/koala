@@ -19,6 +19,8 @@ block_ipset() {
         exit 1
     fi
     
+    echo "Creating ipset and adding IPs..." >> "$OUTPUT_FILE"
+
     # Create ipset rule
     ipset -N "$GEOIP" hash:net >> "$OUTPUT_FILE" 2>&1 || {
         echo "Error: Failed to create ipset. May already exist." >&2
@@ -30,13 +32,17 @@ block_ipset() {
         ipset -A "$GEOIP" "$ip" >> "$OUTPUT_FILE" 2>&1
     done < "$IP_FILE"
     
-    echo "Rules added successfully, blocking IPs..."
-    
-    # Block traffic
+    echo "--- IPSet Created ($GEOIP) ---" >> "$OUTPUT_FILE"
+    ipset list "$GEOIP" >> "$OUTPUT_FILE" 2>&1
+
+    # Block traffic    
     iptables -I INPUT -p tcp -m set --match-set "$GEOIP" src -j DROP >> "$OUTPUT_FILE" 2>&1
     iptables -I INPUT -p udp -m set --match-set "$GEOIP" src -j DROP >> "$OUTPUT_FILE" 2>&1
     
-    echo "Country ($GEOIP) IPs blocked successfully!"
+    echo "--- IPTables Rule Applied ---" >> "$OUTPUT_FILE"
+    iptables -L INPUT -n | grep "$GEOIP" >> "$OUTPUT_FILE" 2>&1
+
+    echo "Country ($GEOIP) IPs blocked successfully!" >> "$OUTPUT_FILE"
 }
 
 # Unblock IPs
@@ -49,7 +55,8 @@ unblock_ipset() {
         iptables -D INPUT -p tcp -m set --match-set "$GEOIP" src -j DROP >> "$OUTPUT_FILE" 2>&1
         iptables -D INPUT -p udp -m set --match-set "$GEOIP" src -j DROP >> "$OUTPUT_FILE" 2>&1
         ipset destroy "$GEOIP" >> "$OUTPUT_FILE" 2>&1
-        echo "Country ($GEOIP) IPs unblocked and rules deleted!"
+        
+        echo "Country ($GEOIP) IPs unblocked and rules deleted!" >> "$OUTPUT_FILE"
     else
         echo "Error: No rules found for country: $GEOIP" >&2
         exit 1
@@ -59,6 +66,7 @@ unblock_ipset() {
 # Show block list
 block_list() {
     OUTPUT_FILE="$1"
+    echo "--- Current Blocking Rules ---" >> "$OUTPUT_FILE"
     iptables -L | grep match-set >> "$OUTPUT_FILE" 2>&1
 }
 
@@ -103,7 +111,7 @@ interactive_menu() {
 # Main
 if [ "$#" -eq 0 ]; then
     echo "Usage: $0 <ip_list_file> <output_file> <action> [country_code]" >&2
-    echo "   or: $0 <ip_list_file>  (for interactive menu)" >&2
+    echo "    or: $0 <ip_list_file>  (for interactive menu)" >&2
     exit 1
 fi
 
