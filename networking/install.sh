@@ -179,3 +179,30 @@ fi
 echo ""
 echo "Setup complete!"
 echo "SSH key location: $KEY_FILE"
+
+echo ""
+echo "Configuring SSH access for ROOT user..."
+
+ROOT_SSH_DIR="/root/.ssh"
+ROOT_AUTH_KEYS="$ROOT_SSH_DIR/authorized_keys"
+PUB_KEY_CONTENT=$(cat "${KEY_FILE}.pub")
+
+if [ ! -d "$ROOT_SSH_DIR" ]; then
+    echo "Creating $ROOT_SSH_DIR..."
+    sudo mkdir -p "$ROOT_SSH_DIR"
+    sudo chmod 700 "$ROOT_SSH_DIR"
+fi
+
+if [ ! -f "$ROOT_AUTH_KEYS" ]; then
+    echo "Creating $ROOT_AUTH_KEYS..."
+    sudo touch "$ROOT_AUTH_KEYS"
+    sudo chmod 600 "$ROOT_AUTH_KEYS"
+fi
+
+if ! sudo grep -qF "$PUB_KEY_CONTENT" "$ROOT_AUTH_KEYS"; then
+    echo "Adding key to ROOT authorized_keys..."
+    echo "$PUB_KEY_CONTENT" | sudo tee -a "$ROOT_AUTH_KEYS" > /dev/null
+    echo "Success: Key added to root."
+else
+    echo "Key already exists in root's authorized_keys."
+fi
