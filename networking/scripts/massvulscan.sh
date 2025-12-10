@@ -9,11 +9,11 @@ else
     script_dir=$(dirname "$0")
 fi
 dir_name=$(cd "$script_dir" && pwd)
-TOP=$(git rev-parse --show-toplevel)
-source_installation="$TOP/networking/sources/installation.sh"
-source_top_tcp="$TOP/networking/sources/top-ports-tcp-1000.txt"
-source_top_udp="$TOP/networking/sources/top-ports-udp-1000.txt"
-report_folder="$TOP/networking/outputs/"
+grandparent_dir=$(dirname "$(dirname "$dir_name")")
+source_installation="$grandparent_dir/networking/sources/installation.sh"
+source_top_tcp="$grandparent_dir/networking/sources/top-ports-tcp-1000.txt"
+source_top_udp="$grandparent_dir/networking/sources/top-ports-udp-1000.txt"
+report_folder="$grandparent_dir/networking/outputs/"
 
 # ANSI Colors
 blue_color="\033[0;36m"
@@ -1370,7 +1370,7 @@ if [ "${host_parameter}" = "yes" ]; then
 fi
 
 if [ "${no_nmap_scan}" != "on" ]; then
-    nmap_bootstrap="${dir_name}/stylesheet/nmap-bootstrap.xsl"
+    nmap_bootstrap="${grandparent_dir}/networking/stylesheet/nmap-bootstrap.xsl"
     global_report="${hosts_file_no_path}_global-report_${current_date}.html"
 
     if [ -s "${report_folder}${hosts_file_no_path}_vulnerable-hosts-details_${current_date}.txt" ]; then

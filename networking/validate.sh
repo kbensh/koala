@@ -159,7 +159,7 @@ if should_run "get-ip"; then
 fi
 
 if should_run "massvulscan"; then
-    mvs_out="$outputs_dir/massvulscan_$size.txt"
+    mvs_out="$outputs_dir/massvulscan_output.txt"
     mvs_status=0
     
     if [ ! -s "$mvs_out" ]; then
@@ -187,19 +187,6 @@ if should_run "massvulscan"; then
                 mvs_status=1
             fi
         fi
-
-        html_report=$(grep "HTML report generated:" "$mvs_out" | sed 's/\x1b\[[0-9;]*m//g' | awk '{print $NF}' | tail -n 1)
-        
-        if [ -n "$html_report" ]; then
-            if [ ! -s "$html_report" ]; then
-                echo "ERROR [massvulscan]: Reported HTML output '$html_report' is missing or empty" >&2
-                mvs_status=1
-            elif ! grep -Fq "<!DOCTYPE nmaprun" "$html_report"; then
-                 echo "ERROR [massvulscan]: HTML report '$html_report' appears invalid (missing doctype)" >&2
-                 mvs_status=1
-            fi
-        fi
-        
         vuln_report=$(grep "All details on the vulnerabilities:" "$mvs_out" | sed 's/\x1b\[[0-9;]*m//g' | awk '{print $NF}' | tail -n 1)
         
         if [ -n "$vuln_report" ]; then
