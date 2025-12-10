@@ -167,7 +167,7 @@ if should_run "massvulscan"; then
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/massvulscan.sh")"
     export BENCHMARK_SCRIPT
-    $KOALA_SHELL $scripts_dir/massvulscan.sh -a -f $input_dir/gateway_target.txt
+    $KOALA_SHELL $scripts_dir/massvulscan.sh -a -f $input_dir/gateway_target.txt >  $outputs_dir/massvulscan_output.txt 2>&1
     echo $?
 fi
 
@@ -198,7 +198,7 @@ if should_run "pingsweep"; then
     export BENCHMARK_INPUT_FILE="$input_dir/gateway_target.txt"
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/pingsweep.sh")"
     export BENCHMARK_SCRIPT
-    $KOALA_SHELL $scripts_dir/pingsweep.sh 10.200.1 $outputs_dir/pingsweep.txt
+    $KOALA_SHELL $scripts_dir/pingsweep.sh 127.0.0 $outputs_dir/pingsweep.txt
     echo $?
 fi
 

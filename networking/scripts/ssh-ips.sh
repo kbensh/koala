@@ -19,7 +19,7 @@ remoteipadd(){
     output_file="$2"
 
     echo " [OPENING] Port $port for $client on $LOCALHOST (via SSH as $CURRENT_USER)..."
-    ssh -o StrictHostKeyChecking=no -i "$HOME/.ssh/id_rsa_ip_ssh" -n ${CURRENT_USER}@${LOCALHOST} /sbin/iptables -I INPUT -i ${wallif} -s ${client} -d ${ip} -p tcp --destination-port ${port} -j ACCEPT >> "$output_file" 2>&1
+    ssh -o StrictHostKeyChecking=no -i "$HOME/.ssh/id_rsa_ip_ssh" -n ${CURRENT_USER}@${LOCALHOST} /sbin/iptables -I INPUT -i ${wallif} -s ${client} -d ${ip} -p tcp --destination-port ${port} -j ACCEPT > "$output_file" 2>&1
 }
 
 # Function: Delete an IP over ssh from localhost
@@ -31,7 +31,7 @@ remoteipdelete(){
     output_file="$2"
 
     echo " [CLOSING] Port $port for $client on $LOCALHOST (via SSH as $CURRENT_USER)..."
-    ssh -o StrictHostKeyChecking=no -i "$HOME/.ssh/id_rsa_ip_ssh" -n ${CURRENT_USER}@${LOCALHOST} /sbin/iptables -D INPUT -i ${wallif} -s ${client} -d ${ip} -p tcp --destination-port ${port} -j ACCEPT >> "$output_file" 2>&1
+    ssh -o StrictHostKeyChecking=no -i "$HOME/.ssh/id_rsa_ip_ssh" -n ${CURRENT_USER}@${LOCALHOST} /sbin/iptables -D INPUT -i ${wallif} -s ${client} -d ${ip} -p tcp --destination-port ${port} -j ACCEPT > "$output_file" 2>&1
 }
 
 usage(){
@@ -70,9 +70,6 @@ if [ ! -f "$FILE" ]; then
     echo "Error: File '$FILE' not found."
     exit 1
 fi
-
-# Clear output file
-> "$OUTPUT_FILE"
 
 echo "Connecting to: ${CURRENT_USER}@${LOCALHOST}"
 echo ""

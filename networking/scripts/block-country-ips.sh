@@ -19,7 +19,7 @@ block_ipset() {
         exit 1
     fi
     
-    echo "Creating ipset and adding IPs..." >> "$OUTPUT_FILE"
+    echo "Creating ipset and adding IPs..." > "$OUTPUT_FILE"
 
     # Create ipset rule
     ipset -N "$GEOIP" hash:net >> "$OUTPUT_FILE" 2>&1 || {
@@ -52,7 +52,7 @@ unblock_ipset() {
     
     # Check if rule exists
     if ipset list | grep -q "Name: $GEOIP"; then
-        iptables -D INPUT -p tcp -m set --match-set "$GEOIP" src -j DROP >> "$OUTPUT_FILE" 2>&1
+        iptables -D INPUT -p tcp -m set --match-set "$GEOIP" src -j DROP > "$OUTPUT_FILE" 2>&1
         iptables -D INPUT -p udp -m set --match-set "$GEOIP" src -j DROP >> "$OUTPUT_FILE" 2>&1
         ipset destroy "$GEOIP" >> "$OUTPUT_FILE" 2>&1
         
@@ -66,7 +66,7 @@ unblock_ipset() {
 # Show block list
 block_list() {
     OUTPUT_FILE="$1"
-    echo "--- Current Blocking Rules ---" >> "$OUTPUT_FILE"
+    echo "--- Current Blocking Rules ---" > "$OUTPUT_FILE"
     iptables -L | grep match-set >> "$OUTPUT_FILE" 2>&1
 }
 

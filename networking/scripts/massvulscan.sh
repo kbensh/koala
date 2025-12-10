@@ -1,12 +1,9 @@
 #!/bin/sh
 
-# source: https://github.com/choupit0/MassVulScan/blob/master/MassVulScan.sh
+# adapted from source: https://github.com/choupit0/MassVulScan/blob/master/MassVulScan.sh
 version="3.0.0"
 
-# We enter the directory of $0 and print the working directory
 if [ -h "$0" ]; then
-    # If $0 is a symlink, resolving it strictly in POSIX is complex without readlink -f.
-    # We assume standard dirname usage here.
     script_dir=$(dirname "$0")
 else 
     script_dir=$(dirname "$0")
@@ -26,7 +23,7 @@ purple_color="\033[1;35m"
 bold_color="\033[1m"
 end_color="\033[0m"
 
-# SECONDS is a bashism. Use date for POSIX timing.
+# replace $seconds with date 
 script_start=$(date +%s)
 dns="1.1.1.1"
 network_interface=""
@@ -247,11 +244,7 @@ yellow_info_message(){
 }
 
 logo(){
-    # POSIX sh does not support arrays. We use a string list and awk to pick a random one.
     fonts="smbraille smblock pagga future emboss emboss2"
-    
-    # Pick a random font using awk (standard POSIX utility)
-    # we seed srand with date to ensure randomness
     random_font=$(echo "$fonts" | awk 'BEGIN{srand()} {n=split($0, a, " "); print a[int(rand()*n)+1]}')
 
     current_lang=${LANG}
@@ -264,7 +257,7 @@ logo(){
         export PATH=$PATH:/usr/games
         export LANG=$utf8_locale
         export LC_ALL=$utf8_locale
-        printf '\n'
+        echo
         
         # Note: toilet, boxes, lolcat are external dependencies
         toilet -f "${random_font}" "MassVulScan" | boxes -d peek -a hc -p h1 | lolcat
@@ -272,7 +265,7 @@ logo(){
         
         export LANG=${current_lang}
         export LC_ALL=${current_lc_all}
-        printf '\n'
+        echo
     else
         gum style --foreground 42 --bold --border thick "M a s s V u l S c a n"
         gum style --foreground 5 --bold --align right --width 25 "v${version}"
@@ -281,7 +274,6 @@ logo(){
 
 # Root user?
 root_user(){
-    # Using -ne for integer comparison is safer in POSIX if we are sure it's a number
     if [ "$(id -u)" -ne 0 ]; then
         warning_message_with_border "You are not the root user." "If you have the appropriate permissions (sudoers), rerun the script with 'sudo'."
         exit 1
@@ -401,10 +393,8 @@ root_user
 
 # Checking if process already running
 check_proc="$(pgrep -i massvulscan)"
-# Using wc -l implies counting lines, we trim whitespace if necessary or just compare integers
 check_proc_nb="$(echo "$check_proc" | grep -c .)" 
 
-# POSIX integer comparison using -gt
 if [ "${check_proc_nb}" -gt 2 ]; then
     warning_message_with_border "A process is already running: ${check_proc}"
     exit 1
@@ -431,7 +421,6 @@ elif [ "$host_parameter" = "yes" ] && [ -z "$hosts" ]; then
     exit 1
 fi
 
-# Helper function for absolute path (POSIX replacement for readlink -f)
 get_abs_path(){
     if [ -f "$1" ]; then
         dir=$(dirname "$1")
@@ -1265,9 +1254,6 @@ if [ "${no_nmap_scan}" != "on" ]; then
     }
 
     
-
-[Image of parallel processing flow diagram]
-
 
     # We are launching all the Nmap scanners
     count=1
