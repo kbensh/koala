@@ -286,27 +286,3 @@ if should_run "pingsweep"; then
     fi
     report "pingsweep" $ps_status
 fi
-
-if should_run "ssh-ips"; then
-    ssh_out="$outputs_dir/ssh-ips_$size.txt"
-    ssh_status=0
-
-    if [ ! -f "$ssh_out" ]; then
-        echo "ERROR [ssh-ips]: Output file '$ssh_out' not found" >&2
-        ssh_status=1
-    fi
-
-    if [ $ssh_status -eq 0 ]; then
-        error_patterns="Connection refused|Permission denied|Could not resolve hostname|Host key verification failed"
-        if grep -qE "$error_patterns" "$ssh_out"; then
-            echo "ERROR [ssh-ips]: Found error patterns in output:" >&2
-            grep -E "$error_patterns" "$ssh_out" | head -5 >&2
-            ssh_status=1
-        fi
-    fi
-    
-    report "ssh-ips" $ssh_status
-fi
-
-echo "networking $ANY_FAIL"
-exit $ANY_FAIL

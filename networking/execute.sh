@@ -201,13 +201,3 @@ if should_run "pingsweep"; then
     $KOALA_SHELL $scripts_dir/pingsweep.sh 127.0.0 $outputs_dir/pingsweep.txt
     echo $?
 fi
-
-if should_run "ssh-ips"; then
-    echo "ssh-ips"
-    BENCHMARK_INPUT_FILE="$input_dir/ips_ssh_$size.txt"
-    export BENCHMARK_INPUT_FILE
-    BENCHMARK_SCRIPT="$(realpath "$scripts_dir/ssh-ips.sh")"
-    export BENCHMARK_SCRIPT
-    $KOALA_SHELL "$scripts_dir/ssh-ips.sh" root 10.200.1.1 open "$input_dir/ips_ssh_$size.txt" "$outputs_dir/ssh-ips_$size.txt"
-    echo $?
-fi
