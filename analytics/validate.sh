@@ -5,7 +5,7 @@ eval_dir="${TOP}/analytics"
 hashes_dir="${eval_dir}/hashes"
 outputs_dir="${eval_dir}/outputs"
 mkdir -p "${outputs_dir}"
-
+mkdir -p "${hashes_dir}"
 size="full"
 generate=false
 selected_scripts=""
