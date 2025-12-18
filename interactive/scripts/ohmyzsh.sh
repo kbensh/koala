@@ -18,8 +18,21 @@ user_can_sudo() {
 setup_zshrc() {
   OLD_ZSHRC="$zdot/.zshrc.pre-oh-my-zsh"
   if [ -f "$zdot/.zshrc" ] || [ -h "$zdot/.zshrc" ]; then
-    [ "$KEEP_ZSHRC" = yes ] && return
-    [ -e "$OLD_ZSHRC" ] && mv "$OLD_ZSHRC" "${OLD_ZSHRC}-$(date +%Y-%m-%d_%H-%M-%S)"
+    if [ "$KEEP_ZSHRC" = yes ]; then
+      echo "Found ~/.zshrc. Keeping..."
+      return
+    fi
+    printf 'Do you want to overwrite your existing .zshrc? [Y/n] '
+    read -r opt
+    case $opt in
+      [Yy]*|"") ;;
+      [Nn]*) echo "Overwrite skipped."; return ;;
+      *) echo "Invalid choice. Skipped."; return ;;
+    esac
+
+    if [ -e "$OLD_ZSHRC" ]; then
+      mv "$OLD_ZSHRC" "${OLD_ZSHRC}-$(date +%Y-%m-%d_%H-%M-%S)"
+    fi
     mv "$zdot/.zshrc" "$OLD_ZSHRC"
   fi
   omz=$(echo "$ZSH" | sed "s|^$HOME/|\$HOME/|")
@@ -30,6 +43,14 @@ setup_shell() {
   [ "$CHSH" = no ] && return
   [ "$(basename -- "$SHELL")" = "zsh" ] && return
   command_exists chsh || return
+  printf 'Do you want to change your default shell to zsh? [Y/n] '
+  read -r opt
+  case $opt in
+    [Yy]*|"") ;; # Continue
+    [Nn]*) echo "Shell change skipped."; return ;;
+    *) echo "Invalid choice. Skipped."; return ;;
+  esac
+
   case "$PREFIX" in
     *com.termux*) zsh=zsh ;;
     *)
@@ -52,9 +73,10 @@ while [ $# -gt 0 ]; do
   esac
   shift
 done
-command_exists zsh || { echo "Zsh not installed" >&2; exit 1; }
-[ -d "$ZSH/.git" ] && [ -f "$ZSH/templates/zshrc.zsh-template" ] || { echo "Invalid ZSH dir: $ZSH" >&2; exit 1; }
-[ -n "$ZDOTDIR" ] && mkdir -p "$ZDOTDIR"
 setup_zshrc
 setup_shell
-[ "$RUNZSH" = no ] && echo "Run zsh to try it out."
+if [ "$RUNZSH" = no ]; then
+  echo "Run zsh to try it out."
+else
+  exec zsh -l
+fi
