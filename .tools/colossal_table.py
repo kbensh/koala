@@ -28,13 +28,17 @@ benchmark_category_style = {
     'bio': ('Data analysis', 'Biology', '\\cite{Cappellini2019,puritz2019bio594,ibrahim2021tera}'),
     'ci-cd': ('Continuous Integration', 'Build scripts', '\\cite{riker2022,makeself}'),
     'covid': ('Data analysis', 'Data extraction', '\\cite{covid-mts-source}'),
+    'edgy': ('Misc. Idk', 'Misc. Idk', '\\cite{mcilroy2014coroutine,hs:hotos:2023}'),
     'file-mod': ('Automation Now', 'Misc. Idk', '\\cite{cito2020empirical,dgsh:ieee:2017,posh:atc:2020}'),
     'inference': ('Machine learning', 'Data analysis', '\\cite{lamprou2025foundation,tunney2023bash}'),
+    'interact': ('System admin.', 'Misc. Idk', '\\cite{shnake,ohmyzsh}'),
     'ml': ('Machine learning', 'Data analysis', '\\cite{scikit-learn}'),
+    'net': ('System admin.', 'Networking', '\\cite{Nemeth2017-uf}'),
     'nlp': ('Text processing', 'Machine learning', '\\cite{unix-for-poets-church}'),
     'oneliners': ('Automation Now', 'Text processing', ''),
     'pkg': ('Continuous Integration', 'Automation Now', '\\cite{pacaur,vasilakis2021preventing}'),
     'repl': ('System admin.', 'Misc. Idk', '\\cite{posh:atc:2020,vpsaudit}'),
+    'rand': ('Misc. Idk', 'Misc. Idk', '\\cite{cito2020empirical}'),
     'unixfun': ('Misc. Idk', 'Text processing', '\\cite{bhandari2020solutions}'),
     'weather': ('Data analysis', 'Data extraction', '\\cite{hadoop-guide-2009}'),
     'web-search': ('Misc. Idk', 'Text processing', '\\cite{csci1380}'),
@@ -74,6 +78,10 @@ benchmark_input_description = {
     'unixfun': 'challenge inputs',
     'weather': 'temperature data',
     'web-search': 'root webpages',
+    'rand': '\\xxx',
+    'edgy': '\\xxx',
+    'interact': '\\xxx',
+    'net': '\\xxx',
 }
 
 def roundk(n):
