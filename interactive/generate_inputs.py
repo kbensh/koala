@@ -5,20 +5,20 @@ SIZES = {
     "min": {
         "shnake_lines": 5,
         "shnake_len": 10,
-        "tetris_ops": 20,
-        "bag_count": 10
-    },
-    "small": {
-        "shnake_lines": 50,
-        "shnake_len": 50,
-        "tetris_ops": 200,
+        "tetris_ops": 100,
         "bag_count": 100
     },
-    "full": {
-        "shnake_lines": 5000,
-        "shnake_len": 1000,
-        "tetris_ops": 20000,
+    "small": {
+        "shnake_lines": 5,
+        "shnake_len": 100,
+        "tetris_ops": 10000,
         "bag_count": 10000
+    },
+    "full": {
+        "shnake_lines": 500,
+        "shnake_len": 100,
+        "tetris_ops": 1000000,
+        "bag_count": 1000000
     }
 }
 

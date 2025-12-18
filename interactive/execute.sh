@@ -69,7 +69,7 @@ if should_run "ohmyzsh"; then
     export ZSH="$input_dir/ohmyzsh"
     mkdir -p "$ZSH"
     # Run in non-interactive mode
-    RUNZSH=no CHSH=no $KOALA_SHELL "$scripts_dir/ohmyzsh.sh"
+    RUNZSH=no CHSH=no ZDOTDIR=$outputs_dir $KOALA_SHELL "$scripts_dir/ohmyzsh.sh"
     echo $?
 fi
 

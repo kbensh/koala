@@ -57,33 +57,25 @@ should_run() {
 }
 
 validate_result=0
-
+ZDOTDIR=$outputs_dir
 if should_run "ohmyzsh"; then
-    PATH_1="$outputs_dir/ohmyzsh"
-    PATH_2="$outputs_dir/ohmyzsh_install"
-    PATH_3="$HOME/.oh-my-zsh"
-    PATH_4="$input_dir/ohmyzsh"
+    target_zshrc="$ZDOTDIR/.zshrc"
+    expected_install_dir="${ZSH:-$input_dir/ohmyzsh}"
+    validation_error=0
 
-    FOUND=0
-    for DIR in "$PATH_1" "$PATH_2" "$PATH_3" "$PATH_4"; do
-        if [ -f "$DIR/oh-my-zsh.sh" ]; then
-            echo "OK: Oh My Zsh found at $DIR"
-            echo ohmyzsh 0
-            FOUND=1
-            break
-        fi
-    done
-
-    if [ $FOUND -eq 0 ]; then
-        echo "FAILED: oh-my-zsh.sh not found."
-        echo "Checked locations:"
-        echo "  - $PATH_1"
-        echo "  - $PATH_2"
-        echo "  - $PATH_3"
-        echo "  - $PATH_4"
-        echo ohmyzsh 1
-        validate_result=1
+    if [ ! -f "$expected_install_dir/oh-my-zsh.sh" ]; then
+        validation_error=1
     fi
+
+    if [ ! -f "$target_zshrc" ]; then
+        validation_error=1
+    else
+        if ! grep -q "export ZSH=" "$target_zshrc"; then
+            validation_error=1
+        fi
+    fi
+
+    echo ohmyzsh $validation_error
 fi
 
 cd "$outputs_dir" || exit
