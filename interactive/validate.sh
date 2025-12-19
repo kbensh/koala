@@ -83,12 +83,6 @@ if $generate; then
     if should_run "shnake"; then
         md5sum "shnake_$size.out" > "$hashes_dir/shnake_$size.md5sum"
     fi
-    if should_run "tetris-bag"; then
-        md5sum "tetris_bag_$size.out" > "$hashes_dir/tetris_bag_$size.md5sum"
-    fi
-    if should_run "tetris-collision"; then
-        md5sum "tetris_collision_$size.out" > "$hashes_dir/tetris_collision_$size.md5sum"
-    fi
 fi
 
 if should_run "shnake"; then

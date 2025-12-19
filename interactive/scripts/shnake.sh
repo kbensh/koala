@@ -28,7 +28,6 @@ while IFS= read -r line || [ -n "$line" ]; do
             left)  x=$((x - 1));;
             right) x=$((x + 1));;
         esac
-        # printf '%d,%d\n' "$x" "$y"
+        printf '%d,%d\n' "$x" "$y"
     done
 done
-printf '%d,%d\n' "$x" "$y"
