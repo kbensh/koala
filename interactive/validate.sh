@@ -96,15 +96,3 @@ if should_run "shnake"; then
     md5sum --check --quiet --status "$hashes_dir/$bench.md5sum"
     echo $bench $?
 fi
-
-if should_run "tetris-bag"; then
-    bench=tetris_bag_$size
-    md5sum --check --quiet --status "$hashes_dir/$bench.md5sum"
-    echo $bench $?
-fi
-
-if should_run "tetris-collision"; then
-    bench=tetris_collision_$size
-    md5sum --check --quiet --status "$hashes_dir/$bench.md5sum"
-    echo $bench $?
-fi

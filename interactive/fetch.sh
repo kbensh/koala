@@ -49,3 +49,5 @@ download_ohmyzsh() {
 }
 
 download_ohmyzsh
+
+python3 generate_inputs.py

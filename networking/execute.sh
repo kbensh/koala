@@ -167,29 +167,12 @@ if should_run "massvulscan"; then
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/massvulscan.sh")"
     export BENCHMARK_SCRIPT
-    $KOALA_SHELL $scripts_dir/massvulscan.sh -a -f $input_dir/gateway_target.txt >  $outputs_dir/massvulscan_output.txt 2>&1
-    echo $?
-fi
-
-if should_run "networkconf"; then
-    echo "networkconf"
-    BENCHMARK_INPUT_FILE=""
-    export BENCHMARK_INPUT_FILE
-    BENCHMARK_SCRIPT="$(realpath "$scripts_dir/networkconf.sh")"
-    export BENCHMARK_SCRIPT
-    $KOALA_SHELL $scripts_dir/networkconf.sh $outputs_dir/networkconf.txt
-    echo $?
-fi
-
-if should_run "onetwopunch"; then
-    echo "onetwopunch"
-    BENCH_IFACE=$(ip route get 10.200.1.1 | grep dev | awk '{print $3}')
-    
-    export BENCHMARK_INPUT_FILE="$input_dir/gateway_target.txt"
-    BENCHMARK_SCRIPT="$(realpath "$scripts_dir/onetwopunch.sh")"
-    export BENCHMARK_SCRIPT
-
-    $KOALA_SHELL $scripts_dir/onetwopunch.sh -t "$input_dir/gateway_target.txt" -i "$BENCH_IFACE" -p all -o "$outputs_dir/onetwopunch"
+    if [ "$(id -u)" -ne 0 ]; then
+        CMD="sudo $KOALA_SHELL"
+    else
+        CMD="$KOALA_SHELL"
+    fi
+    $CMD $BENCHMARK_SCRIPT -a -f "$BENCHMARK_INPUT_FILE" > "$outputs_dir/massvulscan_output.txt" 2>&1
     echo $?
 fi
 

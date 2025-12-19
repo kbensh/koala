@@ -27,10 +27,7 @@ sudo apt-get install -y \
     net-tools \
     xsltproc \
     bind9-dnsutils \
-    gum \
-    netcat-traditional \
-    toilet \
-    boxes
+    netcat-traditional
 
 sudo apt-get install -y \
     nmap \
@@ -49,25 +46,6 @@ sudo apt-get install -y \
     postgresql \
     postgresql-contrib \
     check
-
-cd /tmp
-
-echo "Adding kali repository to apt sources"
-sudo touch /etc/apt/sources.list.d/kali.list
-sudo chmod 666 /etc/apt/sources.list.d/kali.list
-sudo echo 'deb https://http.kali.org/kali kali-rolling main non-free contrib' > /etc/apt/sources.list.d/kali.list
-sudo chmod 644 /etc/apt/sources.list.d/kali.list
-sudo apt install gnupg
-wget 'https://archive.kali.org/archive-key.asc'
-sudo apt-key add archive-key.asc
-rm archive-key.asc
-echo "Setting low priority for kali repository"
-sudo touch /etc/apt/preferences.d/kali.pref
-sudo chmod 666 /etc/apt/preferences.d/kali.pref 
-echo 'Package: *'>/etc/apt/preferences.d/kali.pref
-echo 'Pin: release a=kali-rolling'>>/etc/apt/preferences.d/kali.pref
-echo 'Pin-Priority: 50'>>/etc/apt/preferences.d/kali.pref
-sudo chmod 644 /etc/apt/preferences.d/kali.pref
 
 cd /tmp
 git clone https://github.com/ofalk/libdnet
@@ -108,34 +86,3 @@ fi
 
 # Update locate database if available
 sudo updatedb || true
-
-# Install Vulners NSE script
-echo -e "${blue_color}[-] Installing Vulners NSE script...${end_color}"
-if [[ $(which nmap) == */local/* ]]; then
-    nmap_scripts_folder="/usr/local/share/nmap/scripts/"
-else
-    nmap_scripts_folder="/usr/share/nmap/scripts/"
-fi
-
-mkdir -p "${nmap_scripts_folder}"
-wget -q https://raw.githubusercontent.com/vulnersCom/nmap-vulners/master/vulners.nse -O "${nmap_scripts_folder}vulners.nse"
-sudo nmap --script-updatedb
-
-# Check if SSH server is installed
-sudo apt-get update
-sudo apt-get install -y openssh-server
-sudo apt-get install -y openssh-client
-
-# Start SSH service if not running
-echo "Starting SSH service..."
-if command -v systemctl >/dev/null 2>&1; then
-    systemctl start ssh 2>/dev/null || systemctl start sshd 2>/dev/null
-    systemctl enable ssh 2>/dev/null || systemctl enable sshd 2>/dev/null
-elif command -v service >/dev/null 2>&1; then
-    service ssh start 2>/dev/null || service sshd start 2>/dev/null
-else
-    # In Docker, start manually if sshd exists
-    if [ -f /usr/sbin/sshd ]; then
-        /usr/sbin/sshd
-    fi
-fi

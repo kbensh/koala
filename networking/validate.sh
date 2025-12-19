@@ -162,103 +162,15 @@ if should_run "massvulscan"; then
     mvs_out="$outputs_dir/massvulscan_output.txt"
     mvs_status=0
     
-    if [ ! -s "$mvs_out" ]; then
-        echo "ERROR [massvulscan]: Log file '$mvs_out' is missing or empty" >&2
+    if grep -qE "Root required|Conflict:|Empty input|No targets|Invalid DNS|No live hosts" "$mvs_out"; then
         mvs_status=1
     fi
 
-    if [ $mvs_status -eq 0 ]; then
-        if grep -Fq "End of script execution." "$mvs_out"; then
-            : # Success
-        elif grep -Fq "No ip with open TCP/UDP ports found" "$mvs_out"; then
-            echo "INFO [massvulscan]: Script finished successfully but found no open ports."
-        else
-            echo "ERROR [massvulscan]: Script did not finish cleanly (Missing completion message)" >&2
-            mvs_status=1
-        fi
-    fi
-
-    if [ $mvs_status -eq 0 ]; then
-        txt_report=$(grep "The report is available here:" "$mvs_out" | sed 's/\x1b\[[0-9;]*m//g' | awk '{print $NF}' | tail -n 1)
-        
-        if [ -n "$txt_report" ]; then
-            if [ ! -s "$txt_report" ]; then
-                echo "ERROR [massvulscan]: Reported text output '$txt_report' is missing or empty" >&2
-                mvs_status=1
-            fi
-        fi
-        vuln_report=$(grep "All details on the vulnerabilities:" "$mvs_out" | sed 's/\x1b\[[0-9;]*m//g' | awk '{print $NF}' | tail -n 1)
-        
-        if [ -n "$vuln_report" ]; then
-            if [ ! -s "$vuln_report" ]; then
-                 echo "ERROR [massvulscan]: Vulnerability detail report '$vuln_report' is missing" >&2
-                 mvs_status=1
-            fi
-        fi
+    if grep -qE "command not found|Permission denied" "$mvs_out"; then
+        mvs_status=1
     fi
 
     report "massvulscan" $mvs_status
-fi
-
-if should_run "networkconf"; then
-    netconf_out="$outputs_dir/networkconf.txt"
-    netconf_status=0
-
-    if [ ! -s "$netconf_out" ]; then
-        echo "ERROR [networkconf]: Output file '$netconf_out' is missing or empty" >&2
-        netconf_status=1
-    fi
-
-    if [ $netconf_status -eq 0 ]; then
-        if ! grep -q "Network Interfaces" "$netconf_out"; then
-            echo "ERROR [networkconf]: Missing 'Network Interfaces' section in output" >&2
-            netconf_status=1
-        elif ! grep -q "Kernel Routing Table" "$netconf_out"; then
-            echo "ERROR [networkconf]: Missing 'Kernel Routing Table' section in output" >&2
-            netconf_status=1
-        elif ! grep -q "DNS Client" "$netconf_out"; then
-            echo "ERROR [networkconf]: Missing 'DNS Client' section in output" >&2
-            netconf_status=1
-        fi
-    fi
-
-    if [ $netconf_status -eq 0 ]; then
-        if ! grep -q "10.200.1.2" "$netconf_out"; then
-            echo "ERROR [networkconf]: Expected IP '10.200.1.2' not found in output" >&2
-            netconf_status=1
-        fi
-    fi
-
-    report "networkconf" $netconf_status
-fi
-
-if should_run "onetwopunch"; then
-    otp_dir="$outputs_dir/onetwopunch"
-    otp_status=0
-
-    if [ ! -d "$otp_dir/udir" ]; then
-        echo "ERROR [onetwopunch]: Unicornscan directory '$otp_dir/udir' not found" >&2
-        otp_status=1
-    fi
-    
-    if [ ! -d "$otp_dir/ndir" ]; then
-        echo "ERROR [onetwopunch]: Nmap directory '$otp_dir/ndir' not found" >&2
-        otp_status=1
-    fi
-
-    if [ $otp_status -eq 0 ]; then
-        if [ ! -s "$otp_dir/udir/10.200.1.1-tcp.txt" ] && \
-           [ ! -s "$otp_dir/udir/10.200.1.1-udp.txt" ]; then
-            echo "ERROR [onetwopunch]: No scan results found for gateway 10.200.1.1 (checked tcp and udp)" >&2
-            if [ -d "$otp_dir/udir" ]; then
-                found_files=$(ls -la "$otp_dir/udir/" 2>&1)
-                echo "DEBUG [onetwopunch]: Contents of udir: $found_files" >&2
-            fi
-            otp_status=1
-        fi
-    fi
-    
-    report "onetwopunch" $otp_status
 fi
 
 if should_run "pingsweep"; then

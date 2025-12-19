@@ -69,7 +69,7 @@ if should_run "ohmyzsh"; then
     export ZSH="$input_dir/ohmyzsh"
     mkdir -p "$ZSH"
     # Run in non-interactive mode
-    RUNZSH=no CHSH=no ZDOTDIR=$outputs_dir $KOALA_SHELL "$scripts_dir/ohmyzsh.sh"
+    printf 'y\yy\y' | ZDOTDIR=$outputs_dir $KOALA_SHELL "$scripts_dir/ohmyzsh.sh"
     echo $?
 fi
 
@@ -80,25 +80,5 @@ if should_run "shnake"; then
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/shnake.sh")"
     export BENCHMARK_SCRIPT
     $KOALA_SHELL "$scripts_dir/shnake.sh" < "$shnake_input" > "$outputs_dir/shnake_${size}.out"
-    echo $?
-fi
-
-if should_run "tetris-bag"; then
-    echo "tetris-bag"
-    BENCHMARK_INPUT_FILE="$tetris_bag_input"
-    export BENCHMARK_INPUT_FILE
-    BENCHMARK_SCRIPT="$(realpath "$scripts_dir/tetris-bag.sh")"
-    export BENCHMARK_SCRIPT
-    $KOALA_SHELL "$scripts_dir/tetris-bag.sh" < "$tetris_bag_input" > "$outputs_dir/tetris_bag_${size}.out"
-    echo $?
-fi
-
-if should_run "tetris-collision"; then
-    echo "tetris-collision"
-    BENCHMARK_INPUT_FILE="$tetris_collision_input"
-    export BENCHMARK_INPUT_FILE
-    BENCHMARK_SCRIPT="$(realpath "$scripts_dir/tetris-collision.sh")"
-    export BENCHMARK_SCRIPT
-    $KOALA_SHELL "$scripts_dir/tetris-collision.sh" < "$tetris_collision_input" > "$outputs_dir/tetris_collision_${size}.out"
     echo $?
 fi
