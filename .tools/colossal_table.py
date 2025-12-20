@@ -33,7 +33,7 @@ benchmark_category_style = {
     'inference': ('Machine learning', 'Data analysis', '\\cite{lamprou2025foundation,tunney2023bash}'),
     'interact': ('System admin.', 'Misc. Idk', '\\cite{shnake,ohmyzsh}'),
     'ml': ('Machine learning', 'Data analysis', '\\cite{scikit-learn}'),
-    'net': ('System admin.', 'Networking', '\\cite{Nemeth2017-uf}'),
+    'net': ('Net Work', 'System admin.', '\\cite{Nemeth2017-uf}'),
     'nlp': ('Text processing', 'Machine learning', '\\cite{unix-for-poets-church}'),
     'oneliners': ('Automation Now', 'Text processing', ''),
     'pkg': ('Continuous Integration', 'Automation Now', '\\cite{pacaur,vasilakis2021preventing}'),
