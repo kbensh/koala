@@ -107,7 +107,7 @@ def main(data_path, outdir=None):
     df = pd.read_csv(data_path, header=None)
     df.columns = ['script', 'nodes']
     # Unpack node counts
-    df['nodes'] = df['nodes'].apply(lambda x: dict([tuple(i.split(':')) for i in x.split(';')]) if isinstance(x, str) else {})
+    df['nodes'] = df['nodes'].apply(lambda x: dict([tuple(i.rsplit(':', 1)) for i in x.split(';')]) if isinstance(x, str) else {})
     # Transform nodes entries for 'command(eval)' and 'command(alias)' into 'eval' and 'alias'
     df['nodes'] = df['nodes'].apply(lambda x: {extract_special_command(k): int(v) for k, v in x.items()})
     # Filter out non-command nodes
