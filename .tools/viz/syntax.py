@@ -113,28 +113,27 @@ def node_heatmap(df, outdir=None):
 
     heatmap_data = heatmap_data.fillna(0)
     limit = 5
-    # create annotations before capping values then cap the values for display
+    
+    # Compute ALL column from original (uncapped) data
+    all_totals = heatmap_data.sum(axis=1)
+    
     annot_data = heatmap_data.applymap(lambda x: '*' if x > limit else '')
     heatmap_data = heatmap_data.applymap(lambda x: min(x, limit))
     
     # order the y-axis of the heatmap according to the node_order, any nodes not in that list can appear after in any order
     heatmap_data = heatmap_data.loc[[x for x in heatmap_data.index if x not in node_order] + list(reversed(node_order))]
     annot_data = annot_data.loc[[x for x in annot_data.index if x not in node_order] + list(reversed(node_order))]
-
-    # Sort the columns by the sum of the values in each column
-    # heatmap_data = heatmap_data[heatmap_data.sum().sort_values(ascending=True).index]
-    # annot_data = annot_data[heatmap_data.columns]
+    all_totals = all_totals.loc[heatmap_data.index]
 
     # Sort the columns alphabetically
-    cols_sorted = sorted(heatmap_data.columns)
-    heatmap_data = heatmap_data[cols_sorted]
-    annot_data = annot_data[cols_sorted]
-    # Add an overall total column, this should be outside the normalizations
-    heatmap_data['ALL'] = heatmap_data.sum(axis=1)
-    # Create annotation for the ALL column
-    annot_data['ALL'] = heatmap_data['ALL'].apply(lambda x: '*' if x > limit else '')
-    # Cap the ALL column values for display
-    heatmap_data['ALL'] = heatmap_data['ALL'].apply(lambda x: min(x, limit))
+    heatmap_data = heatmap_data[sorted(heatmap_data.columns)]
+    annot_data = annot_data[heatmap_data.columns]
+
+    # Add ALL column using original uncapped totals
+    heatmap_data['ALL'] = all_totals
+    annot_data['ALL'] = all_totals.apply(lambda x: '*' if x > limit else '')
+
+    heatmap_data = heatmap_data.applymap(lambda x: min(x, limit))
 
     # Set the color limit to be 5
     
