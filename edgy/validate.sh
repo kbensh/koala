@@ -60,7 +60,11 @@ should_run() {
 if $generate; then
     if should_run "sieve"; then
         md5sum "sieve_$size.txt" > "$hashes_dir/sieve_$size.md5sum"
-    fi    
+    fi
+    if should_run "try"; then
+        md5sum "try_out.txt" > "$hashes_dir/try_out.md5sum"
+        md5sum "try_test.txt" > "$hashes_dir/try_tes.md5sum"
+    fi     
     exit 0
 fi
 
@@ -69,3 +73,10 @@ if should_run "sieve"; then
     md5sum --check --quiet --status "$hashes_dir/$bench.md5sum"
     echo $bench $?
 fi
+
+if should_run "try"; then
+    bench=try
+    md5sum --check --quiet --status "$hashes_dir/try_out.md5sum"
+    md5sum --check --quiet --status "$hashes_dir/try_tes.md5sum"
+    echo $bench $?
+fi 

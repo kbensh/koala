@@ -58,7 +58,6 @@ should_run() {
     return 1
 }
 
-# Shnake game benchmark
 if should_run "sieve"; then
     echo "sieve"
     BENCHMARK_INPUT_FILE=""
@@ -69,3 +68,12 @@ if should_run "sieve"; then
     echo $?
 fi
 
+if should_run "try"; then
+    echo "try"
+    BENCHMARK_INPUT_FILE=""
+    export BENCHMARK_INPUT_FILE
+    BENCHMARK_SCRIPT="$(realpath "$scripts_dir/try.sh")"
+    export BENCHMARK_SCRIPT
+    $KOALA_SHELL "$scripts_dir/try.sh" -y "echo "test" > "$outputs_dir/try_test.txt"" >> "$outputs_dir/try_out.txt"
+    echo $?
+fi
