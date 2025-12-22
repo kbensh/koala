@@ -1,92 +1,90 @@
 #!/bin/sh
 # MassVulScan adapted from https://github.com/choupit0/MassVulScan
 D=$(cd "$(dirname "$0")/../../networking" && pwd)
-SRC="$D/sources"; OUT="$D/outputs"; DNS="1.1.1.1"
-TCP="$SRC/top-ports-tcp-1000.txt"; UDP="$SRC/top-ports-udp-1000.txt"
+OUT="$D/outputs"
 
-die() { echo "$1" >&2; exit 1; }
-valid_ip() { echo "$1" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+(/[0-9]+)?$' && \
-  { ip=${1%%/*}; OIFS=$IFS; IFS=.; set -- $ip; IFS=$OIFS; [ "$1" -le 255 ] && [ "$2" -le 255 ] && [ "$3" -le 255 ] && [ "$4" -le 255 ]; }; }
+die() { echo "[ERROR] $1" >&2; exit 1; }
 
-# Parse Args
-while [ -n "$1" ]; do case "$1" in
-  -h|--hosts) shift; [ -n "$F_IN" ] && die "Conflict: -h and -f"; RAW="$1" ;;
-  -f|--include-file) shift; [ -n "$RAW" ] && die "Conflict: -h and -f"; F_IN="$1" ;;
-  -x|--exclude-file) shift; F_EX="$1" ;;
-  -a|--all-ports) ALL_P=1 ;;
-  -c|--check-live-hosts) CHK=1 ;;
-  -n|--no-nmap-scan) NO_MAP=1 ;;
-  -d|--dns) shift; DNS="$1" ;;
-  -I|--interface) shift; IFACE="$1" ;;
-  *) die "Usage: $0 -h <ip>|-f <file> [-x <excl>] [-a] [-c] [-n] [-d <dns>] [-I <if>]" ;;
-esac; shift; done
+valid_ip() {
+    echo "$1" | grep -Eq '^([0-9]{1,3}\.){3}[0-9]{1,3}(/[0-9]+)?$' || return 1
+    OIFS=$IFS; IFS=.; set -- ${1%%/*}; IFS=$OIFS
+    [ "$1" -le 255 ] && [ "$2" -le 255 ] && [ "$3" -le 255 ] && [ "$4" -le 255 ]
+}
 
-[ "$(id -u)" -eq 0 ] || die "Root required"
-[ -n "$F_IN" ] && { [ -s "$F_IN" ] || die "Empty input"; RAW=$(cat "$F_IN"); NAME=$(basename "$F_IN"); } || NAME=$(echo "$RAW" | tr '/:' '_')
-[ -n "$RAW" ] || die "No targets"
-valid_ip "$DNS" || die "Invalid DNS"
+while [ -n "$1" ]; do
+    case "$1" in
+        -f) shift; F_IN="$1" ;;
+        -x) shift; F_EX="$1" ;;
+        -I) shift; IFACE="$1" ;;
+    esac
+    shift
+done
 
-# Setup
-TMP=$(mktemp -d /tmp/mvs-XXXXXX); trap 'rm -rf "$TMP" 2>/dev/null' EXIT
-mkdir -p "$OUT"; REPORT="${OUT}/${NAME}_scan_$(date +%F_%H-%M-%S).txt"
+[ "$(id -u)" -eq 0 ] || die "Error: Root required"
+[ -s "$F_IN" ] || die "Error: Input file required and must not be empty"
 
-# Processor: Resolve Hostnames/Validate IPs
-process() { echo "$1" | grep -oE '[^[:space:]]+' | sort -u | while read -r L; do
-  valid_ip "$L" && echo "$L" || dig @"$DNS" "$L" +short | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' | head -1 | awk -v h="$L" '{print $1,h}'; done; }
-process "$RAW" > "$TMP/t_full"; cut -d' ' -f1 "$TMP/t_full" > "$TMP/t"
-[ -s "$TMP/t" ] || die "No valid targets"
-[ -n "$F_EX" ] && process "$(cat "$F_EX")" | cut -d' ' -f1 > "$TMP/e"
+[ -z "$IFACE" ] && IFACE=$(ip route show default | awk '{print $5; exit}')
 
-# Ports & Iface
-[ "$ALL_P" ] && PORTS="1-65535,U:1-65535" || \
-  PORTS="$(grep -v '#' "$TCP" 2>/dev/null || echo 21,22,23,25,53,80,110,143,443,445,993,995,3306,3389,8080),U:$(grep -v '#' "$UDP" 2>/dev/null || echo 53,67,68,69,123,161,500,514)"
-[ -z "$IFACE" ] && IFACE=$(ip route show default | awk '/default/ {print $5; exit}')
+TMP=$(mktemp -d /tmp/mvs-XXXXXX)
+trap 'rm -rf "$TMP"' EXIT
+mkdir -p "$OUT"
+REPORT="${OUT}/$(basename "$F_IN")_scan_$(date +%F_%H-%M-%S).txt"
 
-# 1. Live Check
-if [ "$CHK" ]; then
-  nmap -n -sP -T5 --min-parallelism 100 --max-parallelism 256 -iL "$TMP/t" 2>/dev/null | \
-    grep -B1 "Host is up" | grep -oE '\b([0-9]{1,3}\.){3}[0-9]{1,3}\b' > "$TMP/live"
-  [ -s "$TMP/live" ] || { echo "No live hosts." >> "$REPORT"; die "No live hosts"; }
-  mv "$TMP/live" "$TMP/t"; echo "Live Hosts: $(wc -l < "$TMP/t")" >> "$REPORT"
+# Validate IPs
+grep -v '^#' "$F_IN" | while read -r ip; do
+    valid_ip "$ip" && echo "$ip"
+done | sort -u > "$TMP/t"
+[ -s "$TMP/t" ] || die "Error: No valid IPs"
+
+if [ -n "$F_EX" ]; then
+    grep -v '^#' "$F_EX" | while read -r ip; do
+        valid_ip "$ip" && echo "$ip"
+    done | sort -u > "$TMP/e"
+    debug "Exclusions: $(cat "$TMP/e" | tr '\n' ' ')"
 fi
+
+# 1. Live check
+debug "Starting live host check..."
+nmap -n -sP -T5 --min-parallelism 100 --max-parallelism 256 -iL "$TMP/t" 2>/dev/null \
+    | tee "$TMP/nmap_ping_raw" \
+    | grep -oE '\b([0-9]{1,3}\.){3}[0-9]{1,3}\b' > "$TMP/live"
+debug "Nmap ping output: $(cat "$TMP/nmap_ping_raw")"
+debug "Live hosts: $(cat "$TMP/live" | tr '\n' ' ')"
+[ -s "$TMP/live" ] || die "Error: No live hosts"
+mv "$TMP/live" "$TMP/t"
 
 # 2. Masscan
-CMD="masscan --open -p$PORTS --source-port 40000 -iL $TMP/t -e $IFACE --max-rate 1500 --wait 5"
+CMD="masscan --open -p1-65535,U:1-65535 --source-port 40000 -iL $TMP/t -e $IFACE --max-rate 1500 --wait 5"
 [ -s "$TMP/e" ] && CMD="$CMD --excludefile $TMP/e"
-$CMD > "$TMP/raw" 2>&1; [ -s "$TMP/raw" ] || { echo "No open ports." >> "$REPORT"; exit 0; }
+$CMD > "$TMP/raw" 2>&1
+[ -s "$TMP/raw" ] || { echo "No open ports." >> "$REPORT"; debug "No open ports found, exiting"; exit 0; }
 
-# 3. Parsing (Original Logic)
-TCP_CNT=$(grep -c "^Discovered open port.*tcp" "$TMP/raw" || echo 0)
-UDP_CNT=$(grep -c "^Discovered open port.*udp" "$TMP/raw" || echo 0)
-parse_masscan() {
-    proto="$1"
-    grep "Discovered open port .*/${proto} on" "$TMP/raw" | awk -v proto="$proto" '
-    {
-        split($4, p, "/"); port = p[1]; ip = $6
-        if (!seen[ip]) { order[++i] = ip; seen[ip] = 1; ips[ip] = port }
-        else { ips[ip] = ips[ip] "," port }
-    }
-    END { for (j = 1; j <= i; j++) printf("%s:%s:%s\n", proto, order[j], ips[order[j]]) }'
+# 3. Parse masscan output
+awk '/Discovered open port/ {
+    split($4, p, "/"); port = p[1]; proto = p[2]; ip = $6
+    key = proto ":" ip
+    if (!seen[key]++) { order[++n] = key }
+    ports[key] = ports[key] ? ports[key] "," port : port
 }
-rm -f "$TMP/list"
-[ "$TCP_CNT" -gt 0 ] && parse_masscan tcp >> "$TMP/list"
-[ "$UDP_CNT" -gt 0 ] && parse_masscan udp >> "$TMP/list"
-echo "Hosts Found: $(wc -l < "$TMP/list" 2>/dev/null || echo 0)" >> "$REPORT"
+END {
+    for (i = 1; i <= n; i++) print order[i] ":" ports[order[i]]
+}' "$TMP/raw" > "$TMP/list"
+echo "Hosts Found: $(wc -l < "$TMP/list")" >> "$REPORT"
 
 # 4. Nmap
-if [ -z "$NO_MAP" ] && [ -s "$TMP/list" ]; then
-  mkdir "$TMP/n"; while read -r L; do
-    while [ "$(jobs 2>/dev/null | wc -l)" -ge 50 ]; do sleep 1; done
-    proto=${L%%:*}; rest=${L#*:}; ip=${rest%%:*}; pts=${rest#*:}
+mkdir "$TMP/n"
+while IFS=: read -r proto ip pts; do
+    while [ "$(jobs | wc -l)" -ge 50 ]; do sleep 1; done
     [ "$proto" = "tcp" ] && F="-sT" || F="-sU"
-    nmap -Pn $F -sV -n -p"$pts" --max-retries 2 --max-rtt-timeout 500ms -oN "$TMP/n/${ip}_${proto}.nmap" "$ip" >/dev/null 2>&1 &
-  done < "$TMP/list"; wait
-  for f in "$TMP/n"/*.nmap; do
+    debug "Scanning $ip ($proto) ports: $pts"
+    nmap -Pn $F -sV -n -p"$pts" --max-retries 2 --max-rtt-timeout 500ms \
+        -oN "$TMP/n/${ip}_${proto}.nmap" "$ip" >/dev/null 2>&1 &
+done < "$TMP/list"
+wait
+
+for f in "$TMP/n"/*.nmap; do
     [ -e "$f" ] || continue
-    echo "" >> "$REPORT"
-    echo "--- $(basename "$f" .nmap) ---" >> "$REPORT"
-    sed -n '/Nmap scan report for/,/Service detection performed/p' "$f" | head -n -1 >> "$REPORT"
-  done
-else
-  echo "Nmap skipped." >> "$REPORT"
-fi
+    debug "Processing result: $f"
+    echo "\n--- $(basename "$f" .nmap) ---" >> "$REPORT"
+    sed -n '/Nmap scan report/,/Service detection/p' "$f" | head -n -1 >> "$REPORT"
+done

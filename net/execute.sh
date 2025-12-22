@@ -141,26 +141,6 @@ if should_run "accept-ips"; then
     echo $?
 fi
 
-if should_run "block-country-ips"; then
-    echo "block-country-ips"
-    BENCHMARK_INPUT_FILE="$input_dir/ips_$size.txt"
-    export BENCHMARK_INPUT_FILE
-    BENCHMARK_SCRIPT="$(realpath "$scripts_dir/block-country-ips.sh")"
-    export BENCHMARK_SCRIPT
-    $KOALA_SHELL $scripts_dir/block-country-ips.sh $input_dir/ips_$size.txt $outputs_dir/block-country-ips_$size.txt block dummy
-    echo $?
-fi
-
-if should_run "get-ip"; then
-    echo "get-ip"
-    BENCHMARK_INPUT_FILE=""
-    export BENCHMARK_INPUT_FILE
-    BENCHMARK_SCRIPT="$(realpath "$scripts_dir/get-ip.sh")"
-    export BENCHMARK_SCRIPT
-    $KOALA_SHELL $scripts_dir/get-ip.sh $outputs_dir/get-ip.txt
-    echo $?
-fi
-
 if should_run "massvulscan"; then
     echo "massvulscan"
     BENCHMARK_INPUT_FILE="$input_dir/gateway_target.txt"
@@ -172,15 +152,15 @@ if should_run "massvulscan"; then
     else
         CMD="$KOALA_SHELL"
     fi
-    $CMD $BENCHMARK_SCRIPT -a -f "$BENCHMARK_INPUT_FILE" > "$outputs_dir/massvulscan_output.txt" 2>&1
+    $CMD $BENCHMARK_SCRIPT -f "$BENCHMARK_INPUT_FILE" > "$outputs_dir/massvulscan_output.txt" 2>&1
     echo $?
 fi
 
-if should_run "pingsweep"; then
-    echo "pingsweep"
-    export BENCHMARK_INPUT_FILE="$input_dir/gateway_target.txt"
-    BENCHMARK_SCRIPT="$(realpath "$scripts_dir/pingsweep.sh")"
+if should_run "ping"; then
+    echo "ping"
+    export BENCHMARK_INPUT_FILE="$input_dir/ping_$size.txt"
+    BENCHMARK_SCRIPT="$(realpath "$scripts_dir/ping.sh")"
     export BENCHMARK_SCRIPT
-    $KOALA_SHELL $scripts_dir/pingsweep.sh 127.0.0 $outputs_dir/pingsweep.txt
+    $KOALA_SHELL $scripts_dir/ping.sh 127.0.0 $input_dir/ping_$size.txt $outputs_dir/ping_$size.txt
     echo $?
 fi

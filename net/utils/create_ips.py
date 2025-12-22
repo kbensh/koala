@@ -34,3 +34,6 @@ if __name__ == "__main__":
     generate_ip_file(os.path.join(base_dir, "ips_min.txt"), 100)
     generate_ip_file(os.path.join(base_dir, "ips_small.txt"), 10_000)
     generate_ip_file(os.path.join(base_dir, "ips_full.txt"), 100_000)
+    generate_ip_file(os.path.join(base_dir, "ping_min.txt"), 50)
+    generate_ip_file(os.path.join(base_dir, "ping_small.txt"), 500)
+    generate_ip_file(os.path.join(base_dir, "ping_full.txt"), 5000)
