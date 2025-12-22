@@ -4,15 +4,13 @@ SUBNET="$1"
 INPUT_FILE="$2"
 OUTPUT_FILE="${3:-ip_sweeper_output.txt}"
 
-echo "Pinging subnet $SUBNET.0/24..." > "$OUTPUT_FILE"
+rm -f "$OUTPUT_FILE"
+
 for ip in $(seq 1 254); do
     if ping -c 1 -W 1 $SUBNET.$ip >> "$OUTPUT_FILE" 2>&1; then
         echo "Host $SUBNET.$ip is UP" >> "$OUTPUT_FILE" 2>&1
     fi
 done
-
-echo "Scanning IPs from $INPUT_FILE..."
-echo "--- Scan Start: $(date) ---" > "$OUTPUT_FILE"
 
 while IFS= read -r target_ip || [ -n "$target_ip" ]; do
     [[ -z "$target_ip" || "$target_ip" =~ ^# ]] && continue
@@ -25,5 +23,3 @@ while IFS= read -r target_ip || [ -n "$target_ip" ]; do
     fi
 
 done < "$INPUT_FILE"
-
-echo "Scan complete. Results saved to $OUTPUT_FILE"
