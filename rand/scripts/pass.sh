@@ -1,3 +1,4 @@
+#!/bin/sh
 # generate a sequence of n passwords, each of length l
 
 n="$1"
