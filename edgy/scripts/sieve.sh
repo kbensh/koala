@@ -1,33 +1,60 @@
 #!/bin/sh
-sequence() {
-    awk "BEGIN { for (i = $1; i <= $3; i += $2) print i }"
+
+sqrt() { echo "$1 v p" | dc; }
+
+sequence_2_to() {
+    awk -v limit="$1" 'BEGIN { for (i=2; i<=limit; i++) print i }'
 }
 
-comps() {
-    _n="$1"
-    _limit=$(echo "$_n vp" | dc)
+sequence() {
+    awk -v start="$1" -v step="$2" -v limit="$3" '
+    BEGIN {
+        for (i = start; i <= limit; i += step)
+            print i
+    }'
+}
 
-    for p in $(primes "$_limit"); do
-        sequence "$((2 * p))" "$p" "$_n"
+get_multiples() {
+    p=$1
+    limit=$2
+    start=$((p * 2))
+    
+    if [ "$start" -le "$limit" ]; then
+        sequence "$start" "$p" "$limit"
+    fi
+}
+
+gen_composites() {
+    n=$1
+    limit_root=$(sqrt "$n")
+    
+    primes "$limit_root" | while read p; do
+        get_multiples "$p" "$n"
     done | sort -u
 }
 
 primes() {
-    _n="$1"
+    n=${1:-1000}
 
-    if [ "$_n" -gt 2 ]; then
-        tmp_comps="/tmp/sieve_$$.$_n"
-        trap 'rm -f "$tmp_comps"' 0 1 2 15
-
-        comps "$_n" > "$tmp_comps"
-
-        sequence 2 1 "$_n" | sort | comm -23 - "$tmp_comps"
-
-    elif [ "$_n" -eq 2 ]; then
-        echo 2
+    if [ "$n" -lt 2 ]; then
+        return
     fi
+
+    tmp_dir=$(mktemp -d) || exit 1
+    trap 'rm -rf "$tmp_dir"; exit' EXIT INT TERM
+    pipe_path="$tmp_dir/pipe"
+
+    mkfifo "$pipe_path"
+
+    ( 
+        gen_composites "$n" > "$pipe_path" 
+    ) 2>/dev/null &
+    pid_writer=$!
+
+    sequence_2_to "$n" | sort | comm -23 - "$pipe_path"
+
+    wait "$pid_writer"
+    rm -r "$tmp_dir"
 }
 
-limit="${1:-1000}"
-out="$2"
-primes "$limit" | sort -n | pr -t -w 80 -s' ' -5 >> $out
+primes "${1:-1000}" $2 | sort -n | pr -t -w 80 -4 > $3

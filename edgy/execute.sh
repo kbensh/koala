@@ -11,17 +11,17 @@ export LC_ALL=C
 
 size=full
 selected_scripts=""
-sieve_size=50000000
+sieve_size=500000000
 while [ $# -gt 0 ]; do
     case "$1" in
         --small)
             size=small
-            sieve_size=500000
+            sieve_size=100000000
             shift
             ;;
         --min)
             size=min
-            sieve_size=50000
+            sieve_size=10000000
             shift
             ;;
         -s|--scripts)
@@ -64,7 +64,7 @@ if should_run "sieve"; then
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/sieve.sh")"
     export BENCHMARK_SCRIPT
-    $KOALA_SHELL "$scripts_dir/sieve.sh" $sieve_size "$outputs_dir/sieve_$size.txt"
+    $KOALA_SHELL "$scripts_dir/sieve.sh" $sieve_size "$outputs_dir" "$outputs_dir/sieve_$size.txt"
     echo $?
 fi
 
@@ -74,6 +74,7 @@ if should_run "try"; then
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/try.sh")"
     export BENCHMARK_SCRIPT
-    $KOALA_SHELL "$scripts_dir/try.sh" -y "echo "test" > "$outputs_dir/try_test.txt"" >> "$outputs_dir/try_out.txt"
+    $KOALA_SHELL "$scripts_dir/try.sh" -y " echo "test" > "/tmp/try_test.txt" " > "$outputs_dir/try_out.txt"
+    cp /tmp/try_test.txt $outputs_dir
     echo $?
 fi
