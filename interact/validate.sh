@@ -1,7 +1,7 @@
 #!/bin/bash
 
 TOP=$(git rev-parse --show-toplevel)
-eval_dir="${TOP}/interactive"
+eval_dir="${TOP}/interact"
 input_dir="${eval_dir}/inputs"
 scripts_dir="${eval_dir}/scripts"
 outputs_dir="${eval_dir}/outputs"

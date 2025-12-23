@@ -1,7 +1,7 @@
 #!/bin/bash
 
 TOP=$(git rev-parse --show-toplevel)
-eval_dir="${TOP}/interactive"
+eval_dir="${TOP}/interact"
 input_dir="${eval_dir}/inputs"
 scripts_dir="${eval_dir}/scripts"
 outputs_dir="${eval_dir}/outputs"
@@ -39,7 +39,7 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-export BENCHMARK_CATEGORY="interactive"
+export BENCHMARK_CATEGORY="interact"
 KOALA_SHELL=${KOALA_SHELL:-bash}
 
 shnake_input="$input_dir/shnake_$size"

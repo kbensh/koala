@@ -7,8 +7,8 @@ for arg in "$@"; do
 done
 
 TOP=$(git rev-parse --show-toplevel)
-input_dir="${TOP}/interactive/inputs"
-outputs_dir="${TOP}/interactive/outputs"
+input_dir="${TOP}/interact/inputs"
+outputs_dir="${TOP}/interact/outputs"
 
 rm -rf "$outputs_dir"
 rm -rf $TOP/miniforge3
