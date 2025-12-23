@@ -14,6 +14,11 @@ SANDBOX_DIR="$(mktemp -d --suffix ".try-$EXECID")"
 UNION_HELPER="unionfs"
 
 export EXECID SANDBOX_DIR UNION_HELPER
+tmpfstype=$(df --output=fstype "$SANDBOX_DIR" 2>/dev/null | tail -n +2)
+if [ "$tmpfstype" = "overlay" ] && [ "$(id -u)" -eq "0" ]; then
+    mount -t tmpfs tmpfs "$SANDBOX_DIR"
+fi
+
 mkdir -p "$SANDBOX_DIR/upperdir" "$SANDBOX_DIR/workdir" "$SANDBOX_DIR/temproot"
 
 DIRS_AND_MOUNTS="$SANDBOX_DIR"/mounts
@@ -119,6 +124,7 @@ change_list=$(analyze_changes)
 
 if [ -z "$change_list" ]; then
     echo "No changes detected."
+    [ -n "$tmpfstype" ] && umount "$SANDBOX_DIR" 2>/dev/null
     exit 0
 fi
 
@@ -171,4 +177,6 @@ case "$response" in
         ;;
 esac
 
-# rm -rf "$SANDBOX_DIR"
+if [ "$(findmnt -n -o FSTYPE -T "$SANDBOX_DIR")" = "tmpfs" ]; then
+    umount "$SANDBOX_DIR"
+fi

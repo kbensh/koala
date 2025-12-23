@@ -63,7 +63,7 @@ if $generate; then
     fi
     if should_run "try"; then
         md5sum "try_out.txt" > "$hashes_dir/try_out.md5sum"
-        md5sum "try_test.txt" > "$hashes_dir/try_test.md5sum"
+        md5sum "try_status.txt" > "$hashes_dir/try_status.md5sum"
     fi     
     exit 0
 fi
@@ -77,6 +77,6 @@ fi
 if should_run "try"; then
     bench=try
     md5sum --check --quiet --status "$hashes_dir/try_out.md5sum"
-    md5sum --check --quiet --status "$hashes_dir/try_test.md5sum"
+    md5sum --check --quiet --status "$hashes_dir/try_status.md5sum"
     echo $bench $?
 fi 

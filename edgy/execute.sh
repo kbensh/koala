@@ -74,7 +74,7 @@ if should_run "try"; then
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/try.sh")"
     export BENCHMARK_SCRIPT
-    $KOALA_SHELL "$scripts_dir/try.sh" -y " echo "test" > "/tmp/try_test.txt" " > "$outputs_dir/try_out.txt"
-    cp /tmp/try_test.txt $outputs_dir
+    $KOALA_SHELL "$scripts_dir/try.sh" -y "mkdir -p /tmp/lib/edgy/test && echo 'works' > /tmp/lib/edgy/test/try_status.txt"> "$outputs_dir/try_out.txt"
+    mv /tmp/lib/edgy/test/try_status.txt $outputs_dir
     echo $?
 fi

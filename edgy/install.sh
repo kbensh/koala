@@ -1,7 +1,13 @@
 #!/bin/sh
 
-sudo apt-get update -y
-sudo apt-get install dc coreutils gawk libfuse3-dev -y
+sudo apt-get update
+sudo apt-get install -y \
+    dc \
+    coreutils \
+    gawk \
+    libfuse3-dev \
+    fuse3 \
+    pkg-config
 
 cd /tmp
 git clone https://github.com/rpodgorny/unionfs-fuse.git
