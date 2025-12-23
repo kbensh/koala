@@ -7,8 +7,8 @@ for arg in "$@"; do
 done
 
 TOP=$(git rev-parse --show-toplevel)
-input_dir="${TOP}/networking/inputs"
-outputs_dir="${TOP}/networking/outputs"
+input_dir="${TOP}/net/inputs"
+outputs_dir="${TOP}/net/outputs"
 
 rm -rf "$outputs_dir"
 if [ "$force" = true ]; then

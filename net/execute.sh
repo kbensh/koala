@@ -1,80 +1,82 @@
 #!/bin/bash
 
-# Check if inside namespace
-if [ -n "$KOALA_NETNS_ACTIVE" ]; then
-    # inside the namespace, run normally
-    RUN_IN_NAMESPACE=0
+SCRIPT_PATH="$(realpath "$0")"
+
+# Check if running as root
+if [ "$(id -u)" -eq 0 ]; then
+    SUDO=""
 else
-    #  outside, need to enter namespace
-    RUN_IN_NAMESPACE=1
+    SUDO="sudo"
 fi
 
-# If not in namespace, set up and exec inside
-if [ "$RUN_IN_NAMESPACE" -eq 1 ]; then
-    NETNS_NAME="koala_bench_$$"
-    VETH_HOST="veth_host_$$"
-    VETH_NS="veth_ns_$$"
+NETNS_NAME="koala_bench_$$"
+VETH_HOST="veth_host_$$"
+VETH_NS="veth_ns_$$"
 
-    echo "Setting up network namespace: $NETNS_NAME"
-
-    # Cleanup function
-    cleanup_namespace() {
+cleanup_namespace() {
+    NAMESPACE_CREATED=false
+    if $SUDO ip netns list | grep -q "$NETNS_NAME"; then
         echo ""
         echo "Cleaning up network namespace..."
-        sudo iptables -t nat -D POSTROUTING -s 10.200.1.0/24 ! -d 10.200.1.0/24 -j MASQUERADE 2>/dev/null || true
-        sudo ip netns delete "$NETNS_NAME" 2>/dev/null || true
-        sudo ip link delete "$VETH_HOST" 2>/dev/null || true
-        echo "Namespace cleaned up"
-    }
+        
+        PIDS=$($SUDO ip netns pids "$NETNS_NAME")
+        if [ -n "$PIDS" ]; then
+            echo "Killing lingering processes in namespace ($NETNS_NAME): $PIDS"
+            $SUDO kill -9 $PIDS 2>/dev/null || true
+            sleep 0.5
+        fi
+        # ----------------------------------------------------------
 
-    trap cleanup_namespace EXIT INT TERM
+        $SUDO iptables -t nat -D POSTROUTING -s 10.200.1.0/24 ! -d 10.200.1.0/24 -j MASQUERADE 2>/dev/null || true
+        
+        # Now safe to delete
+        $SUDO ip netns delete "$NETNS_NAME" 2>/dev/null || true
+        $SUDO ip link delete "$VETH_HOST" 2>/dev/null || true
+        echo "Namespace cleaned up"
+    fi
+}
+
+NAMESPACE_CREATED=false
+
+trap '[ "$NAMESPACE_CREATED" = true ] && cleanup_namespace' EXIT INT TERM
+
+
+setup_namespace() {
+    echo "Setting up network namespace: $NETNS_NAME"
 
     # Create network namespace
-    sudo ip netns add "$NETNS_NAME" || {
+    $SUDO ip netns add "$NETNS_NAME" || {
         echo "Error: Failed to create network namespace" >&2
-        exit 1
+        return 1
     }
 
     # Set up loopback
-    sudo ip netns exec "$NETNS_NAME" ip link set lo up
+    $SUDO ip netns exec "$NETNS_NAME" ip link set lo up
 
     # Create veth pair
-    sudo ip link add "$VETH_HOST" type veth peer name "$VETH_NS"
-    sudo ip link set "$VETH_NS" netns "$NETNS_NAME"
+    $SUDO ip link add "$VETH_HOST" type veth peer name "$VETH_NS"
+    $SUDO ip link set "$VETH_NS" netns "$NETNS_NAME"
 
     # Configure host side
-    sudo ip addr add 10.200.1.1/24 dev "$VETH_HOST"
-    sudo ip link set "$VETH_HOST" up
+    $SUDO ip addr add 10.200.1.1/24 dev "$VETH_HOST"
+    $SUDO ip link set "$VETH_HOST" up
 
     # Configure namespace side
-    sudo ip netns exec "$NETNS_NAME" ip addr add 10.200.1.2/24 dev "$VETH_NS"
-    sudo ip netns exec "$NETNS_NAME" ip link set "$VETH_NS" up
-    sudo ip netns exec "$NETNS_NAME" ip route add default via 10.200.1.1
+    $SUDO ip netns exec "$NETNS_NAME" ip addr add 10.200.1.2/24 dev "$VETH_NS"
+    $SUDO ip netns exec "$NETNS_NAME" ip link set "$VETH_NS" up
+    $SUDO ip netns exec "$NETNS_NAME" ip route add default via 10.200.1.1
 
     # Enable forwarding on host
-    sudo bash -c 'echo 1 > /proc/sys/net/ipv4/ip_forward' 2>/dev/null || true
-    sudo iptables -t nat -A POSTROUTING -s 10.200.1.0/24 ! -d 10.200.1.0/24 -j MASQUERADE
-    # Re-execute this script inside the namespace
-    # We're entering as root, so we're root inside the namespace
-    export KOALA_NETNS_ACTIVE=1
-    sudo ip netns exec "$NETNS_NAME" env KOALA_NETNS_ACTIVE=1 bash "$0" "$@"
-    exit_code=$?
+    $SUDO bash -c 'echo 1 > /proc/sys/net/ipv4/ip_forward' 2>/dev/null || true
+    $SUDO iptables -t nat -A POSTROUTING -s 10.200.1.0/24 ! -d 10.200.1.0/24 -j MASQUERADE
+    NAMESPACE_CREATED=true
+}
 
-    echo ""
-    if [ $exit_code -eq 0 ]; then
-        echo "Networking benchmark completed successfully"
-    else
-        echo "Networking benchmark failed with exit code $exit_code"
-    fi
-
-    # cleanup_namespace will be called by trap
-    exit $exit_code
-fi
-
-# Inside namespace, already root (via sudo ip netns exec)
+git config --global --add safe.directory "*" 2>/dev/null
 
 TOP=$(git rev-parse --show-toplevel)
-eval_dir="${TOP}/networking"
+
+eval_dir="${TOP}/net"
 input_dir="${eval_dir}/inputs"
 scripts_dir="${eval_dir}/scripts"
 outputs_dir="${eval_dir}/outputs"
@@ -114,12 +116,11 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-export BENCHMARK_CATEGORY="networking"
+export BENCHMARK_CATEGORY="net"
 KOALA_SHELL=${KOALA_SHELL:-bash}
 
 should_run() {
     script_name=$1
-    # If no scripts specified, run all
     if [ -z "$selected_scripts" ]; then
         return 0
     fi
@@ -131,36 +132,58 @@ should_run() {
     return 1
 }
 
-if should_run "accept-ips"; then
-    echo "accept-ips"
-    BENCHMARK_INPUT_FILE="$input_dir/ips_$size.txt"
-    export BENCHMARK_INPUT_FILE
-    BENCHMARK_SCRIPT="$(realpath "$scripts_dir/accept-ips.sh")"
-    export BENCHMARK_SCRIPT
-    $KOALA_SHELL $scripts_dir/accept-ips.sh $input_dir/ips_$size.txt $outputs_dir/accept-ips_$size.txt
-    echo $?
-fi
-
-if should_run "massvulscan"; then
-    echo "massvulscan"
-    BENCHMARK_INPUT_FILE="$input_dir/gateway_target.txt"
-    export BENCHMARK_INPUT_FILE
-    BENCHMARK_SCRIPT="$(realpath "$scripts_dir/massvulscan.sh")"
-    export BENCHMARK_SCRIPT
-    if [ "$(id -u)" -ne 0 ]; then
-        CMD="sudo $KOALA_SHELL"
-    else
-        CMD="$KOALA_SHELL"
+if should_run "portscan"; then
+    echo "portscan (Running on Host)"
+    
+    export BENCHMARK_INPUT_FILE="$input_dir/localhost.txt"
+    export BENCHMARK_SCRIPT="$(realpath "$scripts_dir/portscan.sh")"
+    
+    # Open persistent listeners on ports 4444, 5555, and 6666
+    for port in 4444 5555 6666; do
+        while true; do nc -l -p $port < /dev/null > /dev/null 2>&1; done &
+    done
+    
+    OUT=$outputs_dir $SUDO $KOALA_SHELL $scripts_dir/portscan.sh -f $BENCHMARK_INPUT_FILE
+    exit_code=$?
+    
+    # Clean up background listeners
+    pkill -f "nc -l -p 4444" 2>/dev/null
+    pkill -f "nc -l -p 5555" 2>/dev/null
+    pkill -f "nc -l -p 6666" 2>/dev/null
+    
+    if [ -f "$outputs_dir/portscan_output.txt" ]; then
+        $SUDO chown $(id -u):$(id -g) "$outputs_dir/portscan_output.txt"
     fi
-    $CMD $BENCHMARK_SCRIPT -f "$BENCHMARK_INPUT_FILE" > "$outputs_dir/massvulscan_output.txt" 2>&1
-    echo $?
+
+    echo $exit_code
 fi
 
 if should_run "ping"; then
-    echo "ping"
+    echo "ping (Running on Host)"
     export BENCHMARK_INPUT_FILE="$input_dir/ping_$size.txt"
-    BENCHMARK_SCRIPT="$(realpath "$scripts_dir/ping.sh")"
-    export BENCHMARK_SCRIPT
-    $KOALA_SHELL $scripts_dir/ping.sh 127.0.0 $input_dir/ping_$size.txt $outputs_dir/ping_$size.txt
+    export BENCHMARK_SCRIPT="$(realpath "$scripts_dir/ping.sh")"
+    $KOALA_SHELL "$scripts_dir/ping.sh" 127.0.0 "$input_dir/ping_$size.txt" "$outputs_dir/ping_$size.txt"
     echo $?
+fi
+
+if should_run "accept-ips"; then
+    echo "accept-ips (Running inside Namespace)"
+    
+    # Setup the namespace specifically for this test
+    setup_namespace
+    
+    export BENCHMARK_INPUT_FILE="$input_dir/ips_$size.txt"
+    export BENCHMARK_SCRIPT="$(realpath "$scripts_dir/accept-ips.sh")"
+    
+    # Execute script inside the namespace
+    $SUDO ip netns exec "$NETNS_NAME" env \
+        BENCHMARK_INPUT_FILE="$BENCHMARK_INPUT_FILE" \
+        BENCHMARK_SCRIPT="$BENCHMARK_SCRIPT" \
+        KOALA_SHELL="$KOALA_SHELL" \
+        LC_ALL=C \
+        $KOALA_SHELL "$scripts_dir/accept-ips.sh" "$input_dir/ips_$size.txt" "$outputs_dir/accept-ips_$size.txt"
+    
+    echo $?
+    
+    cleanup_namespace
 fi

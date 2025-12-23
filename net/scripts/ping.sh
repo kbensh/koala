@@ -13,8 +13,9 @@ for ip in $(seq 1 254); do
 done
 
 while IFS= read -r target_ip || [ -n "$target_ip" ]; do
-    [[ -z "$target_ip" || "$target_ip" =~ ^# ]] && continue
-
+    case "$target_ip" in
+        ""|\#*) continue ;;
+    esac
     # Ping the IP
     if ping -c 1 -W 1 "$target_ip" > /dev/null 2>&1; then
         echo "Host $target_ip is UP" | tee -a "$OUTPUT_FILE"

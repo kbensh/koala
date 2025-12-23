@@ -32,8 +32,6 @@ sudo apt-get install -y \
 sudo apt-get install -y \
     nmap \
     lolcat \
-    toilet \
-    boxes \
     masscan \
     bind9-host \
     geoip-bin \
@@ -45,44 +43,5 @@ sudo apt-get install -y \
     masscan \
     postgresql \
     postgresql-contrib \
-    check
-
-cd /tmp
-git clone https://github.com/ofalk/libdnet
-cd libdnet
-./configure
-make
-sudo make install
-cd /tmp
-
-sudo apt-get update -y
-sudo apt-get install unicornscan -t kali-rolling
-
-service postgresql start
-sleep 3
-if ! sudo -u postgres psql -t -c '\du' | cut -d \| -f 1 | grep -qw unicorn; then
-    echo "Creating PostgreSQL user 'unicorn'..."
-    sudo -u postgres createuser -S -D -R unicorn
-else
-    echo "User 'unicorn' already exists."
-fi
-
-if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -qw unicornscan; then
-    echo "Creating 'unicornscan' database..."
-    sudo -u postgres createdb -O unicorn unicornscan
-else
-    echo "Database 'unicornscan' already exists."
-fi
-
-
-# Install Masscan
-if ! command -v masscan >/dev/null 2>&1; then
-    cd /tmp
-    git clone https://github.com/robertdavidgraham/masscan
-    cd masscan
-    make -j"$(nproc)"
-    sudo make install
-fi
-
-# Update locate database if available
-sudo updatedb || true
+    check \
+    iputils-ping
