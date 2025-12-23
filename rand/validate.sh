@@ -66,7 +66,6 @@ should_run() {
 }
 
 status=0
-
 if should_run "pass"; then
     bench="pass_$size"
     file="pass_$size.txt"

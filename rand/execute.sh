@@ -83,4 +83,5 @@ if should_run "pickname"; then
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/pickname.sh")"
     export BENCHMARK_SCRIPT
     $KOALA_SHELL "$scripts_dir/pickname.sh" $input_dir/all_names.txt $n_teams $outputs_dir/pickname_$size
+    echo $?
 fi
