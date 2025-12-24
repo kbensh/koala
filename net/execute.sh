@@ -10,11 +10,11 @@ else
 fi
 
 NETNS_NAME="koala_bench_$$"
-VETH_HOST="veth_host_$$"
-VETH_NS="veth_ns_$$"
+VETH_HOST="v_hs_$$"
+VETH_NS="v_ns_$$"
 
 cleanup_namespace() {
-    NAMESPACE_CREATED=false
+    # Only cleanup if we actually created it or if it exists
     if $SUDO ip netns list | grep -q "$NETNS_NAME"; then
         echo ""
         echo "Cleaning up network namespace..."
@@ -25,21 +25,24 @@ cleanup_namespace() {
             $SUDO kill -9 $PIDS 2>/dev/null || true
             sleep 0.5
         fi
-        # ----------------------------------------------------------
 
         $SUDO iptables -t nat -D POSTROUTING -s 10.200.1.0/24 ! -d 10.200.1.0/24 -j MASQUERADE 2>/dev/null || true
         
-        # Now safe to delete
+        # Delete namespace first (this usually destroys the veth pair automatically)
         $SUDO ip netns delete "$NETNS_NAME" 2>/dev/null || true
-        $SUDO ip link delete "$VETH_HOST" 2>/dev/null || true
+        
+        # Check if host veth still lingers and delete it if so
+        if $SUDO ip link show "$VETH_HOST" > /dev/null 2>&1; then
+            $SUDO ip link delete "$VETH_HOST" 2>/dev/null || true
+        fi
+        
         echo "Namespace cleaned up"
     fi
 }
 
 NAMESPACE_CREATED=false
 
-trap '[ "$NAMESPACE_CREATED" = true ] && cleanup_namespace' EXIT INT TERM
-
+trap 'cleanup_namespace' EXIT INT TERM
 
 setup_namespace() {
     echo "Setting up network namespace: $NETNS_NAME"
@@ -50,9 +53,9 @@ setup_namespace() {
         return 1
     }
 
-    # Set up loopback
+    # Set up loopback (wait briefly for it to be ready)
     $SUDO ip netns exec "$NETNS_NAME" ip link set lo up
-
+    
     # Create veth pair
     $SUDO ip link add "$VETH_HOST" type veth peer name "$VETH_NS"
     $SUDO ip link set "$VETH_NS" netns "$NETNS_NAME"
@@ -64,6 +67,11 @@ setup_namespace() {
     # Configure namespace side
     $SUDO ip netns exec "$NETNS_NAME" ip addr add 10.200.1.2/24 dev "$VETH_NS"
     $SUDO ip netns exec "$NETNS_NAME" ip link set "$VETH_NS" up
+
+    # CRITICAL FIX: Wait for link carrier to be ready before adding routes
+    # "Nexthop has invalid gateway" occurs because the link isn't fully up yet
+    sleep 0.5
+
     $SUDO ip netns exec "$NETNS_NAME" ip route add default via 10.200.1.1
 
     # Enable forwarding on host

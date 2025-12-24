@@ -78,7 +78,7 @@ if should_run "git-workflow"; then
     export BENCHMARK_INPUT_FILE="${eval_dir}/inputs"
 
     mkdir -p "${eval_dir}/outputs"
-
+    export NUM_COMMITS
     if "$KOALA_SHELL" --posix "$git_script" "$NUM_COMMITS"; then
         exit_code=$?
     else

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -14,15 +14,15 @@ TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 REPORT_FILE="vps-audit-report.txt"
 
 print_header() {
-    local header="$1"
+    header="$1"
     echo -e "\n${BLUE}${BOLD}$header${NC}"
     echo -e "\n$header" >> "$REPORT_FILE"
     echo "================================" >> "$REPORT_FILE"
 }
 
 print_info() {
-    local label="$1"
-    local value="$2"
+    label="$1"
+    value="$2"
     echo -e "${BOLD}$label:${NC} $value"
     echo "$label: $value" >> "$REPORT_FILE"
 }
@@ -72,9 +72,9 @@ print_header "Security Audit Results"
 
 # Function to check and report with three states
 check_security() {
-    local test_name="$1"
-    local status="$2"
-    local message="$3"
+    test_name="$1"
+    status="$2"
+    message="$3"
     
     case $status in
         "PASS")
@@ -265,7 +265,7 @@ fi
 
 # Function to format the message with proper indentation for the report file
 format_for_report() {
-    local message="$1"
+    message="$1"
     echo "$message" >> "$REPORT_FILE"
 }
 

@@ -78,7 +78,7 @@ mkdir -p $outputs_dir/pickname_$size
 
 if should_run "pickname"; then
     echo "pickname"
-    BENCHMARK_INPUT_FILE=""
+    BENCHMARK_INPUT_FILE="$input_dir/all_names.txt"
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/pickname.sh")"
     export BENCHMARK_SCRIPT

@@ -11,7 +11,6 @@ input_dir="${TOP}/interact/inputs"
 outputs_dir="${TOP}/interact/outputs"
 
 rm -rf "$outputs_dir"
-rm -rf $TOP/miniforge3
 if [ "$force" = true ]; then
     rm -rf "$input_dir"
 fi

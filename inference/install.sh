@@ -11,6 +11,7 @@ sudo apt-get install -y --no-install-recommends \
     libjpeg-dev \
     zstd \
     ffmpeg \
+    procps \
     coreutils findutils wget sed unzip curl jq coreutils findutils sed unzip curl imagemagick
 
 

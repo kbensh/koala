@@ -5,7 +5,6 @@ TOP=$(git rev-parse --show-toplevel)
 eval_dir="${TOP}/interact"
 input_dir="${eval_dir}/inputs"
 cd "$(realpath "$(dirname "$0")")" || exit 1
-python3 utils/create_inputs.py
 
 ZSH_TARGET="${input_dir}/ohmyzsh"
 
@@ -13,6 +12,8 @@ ZSH_TARGET="${input_dir}/ohmyzsh"
 REPO=${REPO:-ohmyzsh/ohmyzsh}
 REMOTE=${REMOTE:-https://github.com/${REPO}.git}
 BRANCH=${BRANCH:-master}
+
+python3 utils/create_inputs.py
 
 download_ohmyzsh() {
   echo "Downloading Oh My Zsh to $ZSH_TARGET..."
@@ -22,7 +23,7 @@ download_ohmyzsh() {
   if [ -d "$ZSH_TARGET" ]; then
     echo "Directory $ZSH_TARGET already exists."
     echo "Please remove it first if you want to re-download:"
-    exit 1
+    exit 0
   fi
 
   # Clone the repository
@@ -49,5 +50,3 @@ download_ohmyzsh() {
 }
 
 download_ohmyzsh
-
-python3 generate_inputs.py
