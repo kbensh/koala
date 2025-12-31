@@ -53,6 +53,19 @@ Time in Shell: 0.00 sec
 Time in Commands: 67.93 sec
 ==================================================
 
+Benchmark: edgy
+--------------------------------------------------
+Total CPU time: 71.22 sec
+Total Wall time: 63.26 sec
+Total IO bytes: 28157023740.00
+Max Memory Usage: 16588800.00 bytes
+CPU time per input byte: N/A (no input bytes recorded)
+Memory per input byte: N/A (no input bytes recorded)
+IO per input byte: N/A (no input bytes recorded)
+Time in Shell: 0.02 sec
+Time in Commands: 71.20 sec
+==================================================
+
 Benchmark: file-mod
 --------------------------------------------------
 Total CPU time: 235.20 sec
@@ -79,6 +92,19 @@ Time in Shell: 0.04 sec
 Time in Commands: 1586.66 sec
 ==================================================
 
+Benchmark: interact
+--------------------------------------------------
+Total CPU time: 326.16 sec
+Total Wall time: 293.37 sec
+Total IO bytes: 5994058356.00
+Max Memory Usage: 229376.00 bytes
+CPU time per input byte: 0.000326 sec/byte
+Memory per input byte: 0.229147 bytes/byte
+IO per input byte: 5988.076268 bytes/byte
+Time in Shell: 33.79 sec
+Time in Commands: 292.37 sec
+==================================================
+
 Benchmark: ml
 --------------------------------------------------
 Total CPU time: 1156.00 sec
@@ -90,6 +116,19 @@ Memory per input byte: 41.702350 bytes/byte
 IO per input byte: 220.619825 bytes/byte
 Time in Shell: 0.00 sec
 Time in Commands: 1156.00 sec
+==================================================
+
+Benchmark: net
+--------------------------------------------------
+Total CPU time: 9.31 sec
+Total Wall time: 559.64 sec
+Total IO bytes: 141627051.00
+Max Memory Usage: 44548096.00 bytes
+CPU time per input byte: 0.000059 sec/byte
+Memory per input byte: 283.327160 bytes/byte
+IO per input byte: 900.752080 bytes/byte
+Time in Shell: 0.34 sec
+Time in Commands: 8.97 sec
 ==================================================
 
 Benchmark: nlp
@@ -129,6 +168,19 @@ Memory per input byte: 13.791438 bytes/byte
 IO per input byte: 376.781051 bytes/byte
 Time in Shell: 5.89 sec
 Time in Commands: 201.32 sec
+==================================================
+
+Benchmark: rand
+--------------------------------------------------
+Total CPU time: 978.38 sec
+Total Wall time: 810.25 sec
+Total IO bytes: 507307604362.00
+Max Memory Usage: 50569216.00 bytes
+CPU time per input byte: 0.000064 sec/byte
+Memory per input byte: 3.284565 bytes/byte
+IO per input byte: 32950.572308 bytes/byte
+Time in Shell: 43.81 sec
+Time in Commands: 934.57 sec
 ==================================================
 
 Benchmark: repl
