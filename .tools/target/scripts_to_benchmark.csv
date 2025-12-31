@@ -3,7 +3,9 @@ analytics/scripts/pcaps.sh,analytics
 analytics/scripts/port-scan.sh,analytics
 analytics/scripts/ray-tracing.sh,analytics
 bio/scripts/adapter.sh,bio
+bio/scripts/bio.sh,bio
 bio/scripts/data.sh,bio
+bio/scripts/PARAMS.sh,bio
 bio/scripts/run_5TERA.sh,bio
 bio/scripts/run_dRNASeq.sh,bio
 ci-cd/makeself/makeself-header.sh,ci-cd
@@ -32,6 +34,8 @@ covid/scripts/2.sh,covid
 covid/scripts/3.sh,covid
 covid/scripts/4.sh,covid
 covid/scripts/5.sh,covid
+edgy/scripts/sieve.sh,edgy
+edgy/scripts/try.sh,edgy
 file-mod/scripts/compress_files.sh,file-mod
 file-mod/scripts/encrypt_files.sh,file-mod
 file-mod/scripts/img_convert.sh,file-mod
@@ -40,7 +44,12 @@ file-mod/scripts/to_mp3.sh,file-mod
 inference/scripts/dpt_seq.sh,inference
 inference/scripts/image-annotation.sh,inference
 inference/scripts/playlist-creation.sh,inference
+interact/scripts/ohmyzsh.sh,interact
+interact/scripts/shnake.sh,interact
 ml/scripts/execute.sh,ml
+net/scripts/accept-ips.sh,net
+net/scripts/ping.sh,net
+net/scripts/portscan.sh,net
 nlp/scripts/bigrams_appear_twice.sh,nlp
 nlp/scripts/bigrams.sh,nlp
 nlp/scripts/compare_exodus_genesis.sh,nlp
@@ -79,6 +88,8 @@ oneliners/scripts/uniq-ips.sh,oneliners
 oneliners/scripts/wf.sh,oneliners
 pkg/scripts/pacaur.sh,pkg
 pkg/scripts/proginf.sh,pkg
+rand/scripts/pass.sh,rand
+rand/scripts/pickname.sh,rand
 repl/scripts/git-workflow.sh,repl
 repl/scripts/vps-audit-negate.sh,repl
 repl/scripts/vps-audit.sh,repl

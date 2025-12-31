@@ -47,5 +47,17 @@
          "web-search/scripts/index.sh",
          "web-search/scripts/query.sh",
          "web-search/scripts/c/*.sh"]
+    },
+    "edgy": {
+        "scripts": ["edgy/scripts/*.sh"]
+    },
+    "interact": {
+        "scripts": ["interact/scripts/*.sh"]
+    },
+    "net": {
+        "scripts": ["net/scripts/*.sh"]
+    },
+    "rand": {
+        "scripts": ["rand/scripts/*.sh"]
     }
 }

@@ -1,8 +1,6 @@
-Total 'echo' occurrences across all benchmarks: 441
-Total number of distinct commands: 248
+Total number of distinct commands: 273
 type
-coreutil                54
-other                  135
+coreutil                57
+other                  157
 shell builtin           20
 standard linux tool     39
-Name: command, dtype: int64

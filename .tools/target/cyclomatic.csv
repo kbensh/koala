@@ -3,7 +3,9 @@ analytics/scripts/pcaps.sh,3.0
 analytics/scripts/port-scan.sh,1.0
 analytics/scripts/ray-tracing.sh,1.0
 bio/scripts/adapter.sh,8.0
+bio/scripts/bio.sh,3.0
 bio/scripts/data.sh,2.0
+bio/scripts/PARAMS.sh,1.0
 bio/scripts/run_5TERA.sh,21.0
 bio/scripts/run_dRNASeq.sh,16.0
 ci-cd/makeself/makeself-header.sh,1.0
@@ -32,6 +34,8 @@ covid/scripts/2.sh,1.0
 covid/scripts/3.sh,1.0
 covid/scripts/4.sh,1.0
 covid/scripts/5.sh,1.0
+edgy/scripts/sieve.sh,10.0
+edgy/scripts/try.sh,28.0
 file-mod/scripts/compress_files.sh,2.0
 file-mod/scripts/encrypt_files.sh,3.0
 file-mod/scripts/img_convert.sh,3.0
@@ -40,7 +44,12 @@ file-mod/scripts/to_mp3.sh,2.0
 inference/scripts/dpt_seq.sh,4.0
 inference/scripts/image-annotation.sh,3.0
 inference/scripts/playlist-creation.sh,2.0
+interact/scripts/ohmyzsh.sh,15.0
+interact/scripts/shnake.sh,13.0
 ml/scripts/execute.sh,1.0
+net/scripts/accept-ips.sh,5.0
+net/scripts/ping.sh,6.0
+net/scripts/portscan.sh,17.0
 nlp/scripts/bigrams_appear_twice.sh,3.0
 nlp/scripts/bigrams.sh,3.0
 nlp/scripts/compare_exodus_genesis.sh,3.0
@@ -79,6 +88,8 @@ oneliners/scripts/uniq-ips.sh,1.0
 oneliners/scripts/wf.sh,1.0
 pkg/scripts/pacaur.sh,5.0
 pkg/scripts/proginf.sh,2.0
+rand/scripts/pass.sh,2.0
+rand/scripts/pickname.sh,2.0
 repl/scripts/git-workflow.sh,5.0
 repl/scripts/vps-audit-negate.sh,38.0
 repl/scripts/vps-audit.sh,41.0
@@ -118,7 +129,7 @@ unixfun/scripts/8.sh,1.0
 unixfun/scripts/9.sh,1.0
 weather/scripts/temp-analytics.sh,1.0
 weather/scripts/tuft-weather.sh,3.0
-web-search/scripts/c/combine.sh,3.0
+web-search/scripts/c/combine.sh,4.0
 web-search/scripts/c/invert.sh,1.0
 web-search/scripts/c/process.sh,1.0
 web-search/scripts/crawl.sh,1.0
