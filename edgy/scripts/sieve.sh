@@ -57,4 +57,4 @@ primes() {
     rm -r "$tmp_dir"
 }
 
-primes "${1:-1000}" $2 | sort -n | pr -t -w 80 -4 > $3
+primes "${1:-1000}" | sort -n | pr -t -w 80 -4 > $2

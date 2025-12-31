@@ -64,7 +64,6 @@ CMD="nmap -n -Pn -sT -p- -T3 -v -iL $TMP/t -oG $TMP/raw"
 $CMD > "$TMP/nmap_std" 2>&1
 
 # 3. Parse Nmap Output
-# We look for "open" ports specifically
 awk '/Ports:/ {
     host = $2
     start = 0
