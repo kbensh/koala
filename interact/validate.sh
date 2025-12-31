@@ -11,7 +11,7 @@ export LC_ALL=C
 
 size=full
 selected_scripts=""
-
+generate=false
 while [ $# -gt 0 ]; do
     case "$1" in
         --generate)

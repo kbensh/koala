@@ -23,5 +23,4 @@ sudo apt-get install -y \
     python3-venv \
     ncurses-bin \
     ca-certificates \
-    zsh # \
-   # gettext man-db procps psmisc nano tree ncal x11-apps wget
+    zsh
