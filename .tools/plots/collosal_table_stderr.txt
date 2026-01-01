@@ -1,0 +1,21 @@
+/mnt/patriot/fork/koala/.tools/colossal_table.py:315: SyntaxWarning: invalid escape sequence '\m'
+  & \multicolumn{1}{c}{\\Dom}  & \\#.sh     & LoC     & Small & Full & \\#Cons & \\#Cmd & $t_{S}$  & $t_{C}$  & Mem   & I/O & \\#SC & \\#FD &   \\\\
+0     117322520
+1      35258065
+2       3460149
+3      14345907
+4       7095101
+5       1472282
+6      37947319
+7     154006792
+8      14852620
+9       3386366
+10    178596496
+11      4451080
+12     35194614
+13    118157485
+14      5640039
+15       943977
+16     56712143
+Name: sys_calls, dtype: int64
+Total number of scripts: 133
