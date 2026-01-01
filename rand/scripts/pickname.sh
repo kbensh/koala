@@ -5,5 +5,5 @@ input="$1"
 n_teams="$2"
 out="$3"
 for i in $(seq 1 $n_teams); do
-    cat $input | shuf | head -n 100000 > $out/team_$i.txt
+    cat $input | shuf | head -n 10 > $out/team_$i.txt
 done
