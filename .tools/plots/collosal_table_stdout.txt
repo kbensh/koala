@@ -48,10 +48,12 @@
 \hspace{0.5em} \ldots & & & & & & & & & & & & & &  \\
 \bs{weather} & DA/DE & 2 & 74 & 893\textcolor{gray}{MB} & 146\textcolor{black}{GB} & 11 & 20 & 260\text{ms} & 958\text{s} & 94.2\textcolor{gray}{MB} & 39.1\textcolor{black}{GB} & 56.7m & 50 & \cite{hadoop-guide-2009} \\
 \hspace{0.5em} \ldots & & & & & & & & & & & & & &  \\
+\bs{web-search} & MI/TP & 7 & 82 & 833\textcolor{gray}{MB} & 8.61\textcolor{black}{GB} & 16 & 39 & 11\text{s} & 1343\text{s} & 1.32\textcolor{black}{GB} & 17.1\textcolor{black}{GB} & 112.6m & 174 & \cite{csci1380} \\
+\hspace{0.5em} \ldots & & & & & & & & & & & & & &  \\
 \midrule
 {\textbf{\centering Min}} & & 1 & 20 & 4.00\textcolor{gray}{B} & 4.00\textcolor{gray}{B} & 4 & 1 & 0 & 5.4 & 224\textcolor{gray}{KB} & 135\textcolor{gray}{MB} & 944.0k & 10 & \\
-{\textbf{\centering Mean}} & & 7.8 & 315.6 & 2.93\textcolor{black}{GB} & 30.3\textcolor{black}{GB} & 12.9 & 31.1 & 8.9 & 784.9 & 2.54\textcolor{black}{GB} & 84.6\textcolor{black}{GB} & 46.4m & 201.5 & \\
-{\textbf{\centering Median}} & & 3 & 74 & 991\textcolor{gray}{MB} & 8.40\textcolor{black}{GB} & 11 & 21 & 0.1 & 201.3 & 197\textcolor{gray}{MB} & 23.0\textcolor{black}{GB} & 14.9m & 83 & \\
+{\textbf{\centering Mean}} & & 7.8 & 302.6 & 2.80\textcolor{black}{GB} & 29.0\textcolor{black}{GB} & 13.1 & 31.5 & 9.1 & 815.9 & 2.47\textcolor{black}{GB} & 80.9\textcolor{black}{GB} & 50.1m & 200 & \\
+{\textbf{\centering Median}} & & 3.5 & 78 & 893\textcolor{gray}{MB} & 8.61\textcolor{black}{GB} & 13 & 21.5 & 0.1 & 218.2 & 198\textcolor{gray}{MB} & 20.1\textcolor{black}{GB} & 25.0m & 83.5 & \\
 {\textbf{\centering Max}} & & 36 & 2592 & 24.3\textcolor{black}{GB} & 146\textcolor{black}{GB} & 20 & 134 & 52 & 6720.9 & 25.1\textcolor{black}{GB} & 472\textcolor{black}{GB} & 178.6m & 885 & \\
 
     \bottomrule
