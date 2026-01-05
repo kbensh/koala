@@ -1,4 +1,5 @@
-\begin{tabular}{@{}llrrrrrrrrrrrrl@{}}
+
+    \begin{tabular}{@{}llrrrrrrrrrrrrl@{}}
     \toprule
     \multirow{2}{*}{Benchmark/Script} & \multicolumn{3}{c}{Surface} & \multicolumn{2}{c}{Inputs} & \multicolumn{2}{c}{Syntax} & \multicolumn{4}{c}{Dynamic} & \multicolumn{2}{c}{System} & \multirow{2}{*}{Source} \\
                                       & \multicolumn{1}{c}{\Dom}  & \#.sh     & LoC     & Small & Full & \#Cons & \#Cmd & $t_{S}$  & $t_{C}$  & Mem   & I/O & \#SC & \#FD &   \\
@@ -27,8 +28,6 @@
 \hspace{0.5em} \ldots & & & & & & & & & & & & & &  \\
 \bs{inference} & ML/DA & 3 & 60 & 3.85\textcolor{black}{GB} & 11.7\textcolor{black}{GB} & 15 & 27 & 40\text{ms} & 1586\text{s} & 7.16\textcolor{black}{GB} & 83.7\textcolor{black}{GB} & 37.9m & 81 & \cite{lamprou2025foundation,tunney2023bash} \\
 \bs{interact} & SA/MI & 2 & 96 & 14.9\textcolor{gray}{MB} & 14.9\textcolor{gray}{MB} & 17 & 20 & 33\text{s} & 292\text{s} & 224\textcolor{gray}{KB} & 5.58\textcolor{black}{GB} & 154.0m & 14 & \cite{shnake,ohmyzsh} \\
-\hspace{0.5em} \ttt{shnake.sh} & & & 29 & & & 12 & 6 & 33\text{s} & 292\text{s} & 224\textcolor{gray}{KB} & 5.58\textcolor{black}{GB} & & &  \\
-\hspace{0.5em} \ldots & & & & & & & & & & & & & &  \\
 \bs{ml} & ML/DA & 1 & 47 & 4.71\textcolor{black}{GB} & 15.0\textcolor{black}{GB} & 7 & 1 & \textasciitilde 0 & 1156\text{s} & 7.87\textcolor{black}{GB} & 41.6\textcolor{black}{GB} & 14.9m & 10 & \cite{scikit-learn} \\
 \bs{net} & NW/SA & 3 & 146 & 147\textcolor{gray}{KB} & 1.43\textcolor{gray}{MB} & 18 & 39 & 339\text{ms} & 8\text{s} & 42.5\textcolor{gray}{MB} & 135\textcolor{gray}{MB} & 3.4m & 83 & \cite{Nemeth2017-uf} \\
 \hspace{0.5em} \ttt{ping.sh} & & & 20 & & & 14 & 8 & 130\text{ms} & 510\text{ms} & 768\textcolor{gray}{KB} & 6.43\textcolor{gray}{MB} & & &  \\
@@ -45,8 +44,6 @@
 \hspace{0.5em} \ttt{pacaur.sh} & & & 29 & & & 14 & 19 & 5\text{s} & 81\text{s} & 490\textcolor{gray}{MB} & 14.6\textcolor{black}{GB} & & &  \\
 \hspace{0.5em} \ttt{proginf.sh} & & & 14 & & & 11 & 6 & 10\text{ms} & 120\text{s} & 572\textcolor{gray}{MB} & 709\textcolor{gray}{MB} & & &  \\
 \bs{rand} & MI/MI & 2 & 20 & 14.7\textcolor{gray}{MB} & 14.7\textcolor{gray}{MB} & 10 & 7 & 43\text{s} & 934\text{s} & 48.2\textcolor{gray}{MB} & 472\textcolor{black}{GB} & 118.2m & 30 & \cite{cito2020empirical} \\
-\hspace{0.5em} \ttt{pass.sh} & & & 10 & & & 10 & 5 & 42\text{s} & 386\text{s} & 11.5\textcolor{gray}{MB} & 22.2\textcolor{black}{GB} & & &  \\
-\hspace{0.5em} \ldots & & & & & & & & & & & & & &  \\
 \bs{repl} & SA/MI & 3 & 586 & \multicolumn{2}{c}{N/A} & 19 & 53 & \textasciitilde 0 & 24\text{s} & 197\textcolor{gray}{MB} & 1.21\textcolor{black}{GB} & 5.6m & 79 & \cite{posh:atc:2020,vpsaudit} \\
 \bs{unixfun} & MI/TP & 36 & 70 & 599\textcolor{gray}{MB} & 59.1\textcolor{black}{GB} & 4 & 12 & \textasciitilde 0 & 5\text{s} & 9.80\textcolor{gray}{MB} & 5.71\textcolor{black}{GB} & 944.0k & 733 & \cite{bhandari2020solutions} \\
 \hspace{0.5em} \ttt{1.sh} & & & 2 & & & 3 & 2 & \textasciitilde 0 & 50\text{ms} & 680\textcolor{gray}{KB} & 108\textcolor{gray}{MB} & & &  \\
@@ -62,3 +59,4 @@
 
     \bottomrule
   \end{tabular}
+
