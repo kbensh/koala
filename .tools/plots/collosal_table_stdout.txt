@@ -1,35 +1,40 @@
-
-    \begin{tabular}{@{}llrrrrrrrrrrrrl@{}}
+\begin{tabular}{@{}llrrrrrrrrrrrrl@{}}
     \toprule
     \multirow{2}{*}{Benchmark/Script} & \multicolumn{3}{c}{Surface} & \multicolumn{2}{c}{Inputs} & \multicolumn{2}{c}{Syntax} & \multicolumn{4}{c}{Dynamic} & \multicolumn{2}{c}{System} & \multirow{2}{*}{Source} \\
-        \cline{2-4} \cline{5-6} \cline{7-8} \cline{9-12} \cline{13-14}
                                       & \multicolumn{1}{c}{\Dom}  & \#.sh     & LoC     & Small & Full & \#Cons & \#Cmd & $t_{S}$  & $t_{C}$  & Mem   & I/O & \#SC & \#FD &   \\
         \midrule
     
 \bs{analytics} & SA/DA & 4 & 53 & 1.94\textcolor{black}{GB} & 78.9\textcolor{black}{GB} & 10 & 21 & 10\text{ms} & 84\text{s} & 334\textcolor{gray}{MB} & 23.0\textcolor{black}{GB} & 117.3m & 84 & \cite{dgsh:ieee:2017,posh:atc:2020,drake2014command} \\
 \hspace{0.5em} \ttt{nginx.sh} & & & 19 & & & 10 & 13 & \textasciitilde 0 & 1\text{s} & 10.3\textcolor{gray}{MB} & 1.79\textcolor{black}{GB} & & &  \\
 \hspace{0.5em} \ldots & & & & & & & & & & & & & &  \\
-\bs{bio} & DA/B & 6 & 872 & 24.3\textcolor{black}{GB} & 114\textcolor{black}{GB} & 17 & 71 & 51\text{s} & 6720\text{s} & 25.1\textcolor{black}{GB} & 352\textcolor{black}{GB} & 35.3m & 79 & \cite{Cappellini2019,puritz2019bio594,ibrahim2021tera} \\
+\bs{bio} & DA/BI & 6 & 872 & 24.3\textcolor{black}{GB} & 114\textcolor{black}{GB} & 17 & 71 & 51\text{s} & 6720\text{s} & 25.1\textcolor{black}{GB} & 352\textcolor{black}{GB} & 35.3m & 79 & \cite{Cappellini2019,puritz2019bio594,ibrahim2021tera} \\
+\hspace{0.5em} \ttt{bio.sh} & & & 23 & & & 11 & 14 & 10\text{ms} & 176\text{s} & 20.4\textcolor{gray}{MB} & 16.3\textcolor{black}{GB} & & &  \\
 \hspace{0.5em} \ttt{data.sh} & & & 226 & & & 13 & 44 & 46\text{s} & 3521\text{s} & 25.1\textcolor{black}{GB} & 287\textcolor{black}{GB} & & &  \\
 \hspace{0.5em} \ldots & & & & & & & & & & & & & &  \\
 \bs{ci-cd} & CI/BS & 21 & 2592 & \multicolumn{2}{c}{N/A} & 20 & 134 & 30\text{ms} & 128\text{s} & 461\textcolor{gray}{MB} & 2.35\textcolor{black}{GB} & 3.5m & 885 & \cite{riker2022,makeself} \\
+\hspace{0.5em} \ttt{lsmtest.sh} & & & 63 & & & 12 & 16 & \textasciitilde 0 & 30\text{ms} & 332\textcolor{gray}{KB} & 1.69\textcolor{gray}{MB} & & &  \\
+\hspace{0.5em} \ttt{build.sh} & & & 20 & & & 10 & 8 & \textasciitilde 0 & 15\text{s} & 131\textcolor{gray}{MB} & 566\textcolor{gray}{MB} & & &  \\
 \hspace{0.5em} \ldots & & & & & & & & & & & & & &  \\
 \bs{covid} & DA/DE & 5 & 53 & 3.34\textcolor{black}{GB} & 5.08\textcolor{black}{GB} & 5 & 6 & \textasciitilde 0 & 67\text{s} & 1011\textcolor{gray}{MB} & 80.6\textcolor{black}{GB} & 14.3m & 150 & \cite{covid-mts-source} \\
 \hspace{0.5em} \ttt{1.sh} & & & 9 & & & 5 & 6 & \textasciitilde 0 & 12\text{s} & 13.2\textcolor{gray}{MB} & 17.5\textcolor{black}{GB} & & &  \\
 \hspace{0.5em} \ldots & & & & & & & & & & & & & &  \\
-\bs{edgy} & MI/MI & 2 & 193 & 4.00\textcolor{gray}{B} & 4.00\textcolor{gray}{B} & 20 & 43 & 20\text{ms} & 71\text{s} & 15.8\textcolor{gray}{MB} & 26.2\textcolor{black}{GB} & 7.1m & 141 & \cite{mcilroy2014coroutine,hs:hotos:2023} \\
-\hspace{0.5em} \ldots & & & & & & & & & & & & & &  \\
+\bs{edgy} & MI/MI & 2 & 193 & \multicolumn{2}{c}{N/A} & 20 & 43 & 20\text{ms} & 71\text{s} & 15.8\textcolor{gray}{MB} & 26.2\textcolor{black}{GB} & 7.1m & 141 & \cite{mcilroy2014coroutine,hs:hotos:2023} \\
+\hspace{0.5em} \ttt{sieve.sh} & & & 45 & & & 15 & 21 & 20\text{ms} & 71\text{s} & 15.8\textcolor{gray}{MB} & 26.2\textcolor{black}{GB} & & &  \\
+\hspace{0.5em} \ttt{try.sh} & & & 148 & & & 17 & 29 & \textasciitilde 0 & 30\text{ms} & 1.65\textcolor{gray}{MB} & 1.05\textcolor{gray}{MB} & & &  \\
 \bs{file-mod} & AN/MI & 5 & 41 & 4.35\textcolor{black}{GB} & 39.2\textcolor{black}{GB} & 11 & 10 & 99\text{ms} & 235\text{s} & 164\textcolor{gray}{MB} & 13.9\textcolor{black}{GB} & 1.5m & 61 & \cite{cito2020empirical,dgsh:ieee:2017,posh:atc:2020} \\
+\hspace{0.5em} \ttt{encrypt.sh} & & & 11 & & & 10 & 6 & \textasciitilde 0 & 2\text{s} & 2.82\textcolor{gray}{MB} & 5.10\textcolor{black}{GB} & & &  \\
 \hspace{0.5em} \ttt{img-conv.sh} & & & 11 & & & 11 & 6 & 99\text{ms} & 170\text{s} & 145\textcolor{gray}{MB} & 3.83\textcolor{black}{GB} & & &  \\
 \hspace{0.5em} \ldots & & & & & & & & & & & & & &  \\
 \bs{inference} & ML/DA & 3 & 60 & 3.85\textcolor{black}{GB} & 11.7\textcolor{black}{GB} & 15 & 27 & 40\text{ms} & 1586\text{s} & 7.16\textcolor{black}{GB} & 83.7\textcolor{black}{GB} & 37.9m & 81 & \cite{lamprou2025foundation,tunney2023bash} \\
-\hspace{0.5em} \ldots & & & & & & & & & & & & & &  \\
 \bs{interact} & SA/MI & 2 & 96 & 14.9\textcolor{gray}{MB} & 14.9\textcolor{gray}{MB} & 17 & 20 & 33\text{s} & 292\text{s} & 224\textcolor{gray}{KB} & 5.58\textcolor{black}{GB} & 154.0m & 14 & \cite{shnake,ohmyzsh} \\
+\hspace{0.5em} \ttt{shnake.sh} & & & 29 & & & 12 & 6 & 33\text{s} & 292\text{s} & 224\textcolor{gray}{KB} & 5.58\textcolor{black}{GB} & & &  \\
 \hspace{0.5em} \ldots & & & & & & & & & & & & & &  \\
 \bs{ml} & ML/DA & 1 & 47 & 4.71\textcolor{black}{GB} & 15.0\textcolor{black}{GB} & 7 & 1 & \textasciitilde 0 & 1156\text{s} & 7.87\textcolor{black}{GB} & 41.6\textcolor{black}{GB} & 14.9m & 10 & \cite{scikit-learn} \\
 \bs{net} & NW/SA & 3 & 146 & 147\textcolor{gray}{KB} & 1.43\textcolor{gray}{MB} & 18 & 39 & 339\text{ms} & 8\text{s} & 42.5\textcolor{gray}{MB} & 135\textcolor{gray}{MB} & 3.4m & 83 & \cite{Nemeth2017-uf} \\
+\hspace{0.5em} \ttt{ping.sh} & & & 20 & & & 14 & 8 & 130\text{ms} & 510\text{ms} & 768\textcolor{gray}{KB} & 6.43\textcolor{gray}{MB} & & &  \\
 \hspace{0.5em} \ldots & & & & & & & & & & & & & &  \\
 \bs{nlp} & TP/ML & 23 & 303 & 3k bks & 115.9k bks & 10 & 19 & 15\text{s} & 851\text{s} & 9.62\textcolor{gray}{MB} & 272\textcolor{black}{GB} & 178.6m & 526 & \cite{unix-for-poets-church} \\
+\hspace{0.5em} \ttt{bigrams.sh} & & & 19 & & & 10 & 16 & 710\text{ms} & 50\text{s} & 7.93\textcolor{gray}{MB} & 22.5\textcolor{black}{GB} & & &  \\
 \hspace{0.5em} \ldots & & & & & & & & & & & & & &  \\
 \bs{oneliners} & AN/TP & 13 & 116 & 202\textcolor{gray}{MB} & 13.5\textcolor{black}{GB} & 10 & 23 & 60\text{ms} & 14\text{s} & 199\textcolor{gray}{MB} & 3.77\textcolor{black}{GB} & 4.5m & 288 &  \\
 \hspace{0.5em} \ttt{spell.sh} & & & 11 & & & 6 & 7 & \textasciitilde 0 & 1\text{s} & 8.38\textcolor{gray}{MB} & 523\textcolor{gray}{MB} & & & \cite{bentley-pearl-cacm-1985} \\
@@ -40,22 +45,20 @@
 \hspace{0.5em} \ttt{pacaur.sh} & & & 29 & & & 14 & 19 & 5\text{s} & 81\text{s} & 490\textcolor{gray}{MB} & 14.6\textcolor{black}{GB} & & &  \\
 \hspace{0.5em} \ttt{proginf.sh} & & & 14 & & & 11 & 6 & 10\text{ms} & 120\text{s} & 572\textcolor{gray}{MB} & 709\textcolor{gray}{MB} & & &  \\
 \bs{rand} & MI/MI & 2 & 20 & 14.7\textcolor{gray}{MB} & 14.7\textcolor{gray}{MB} & 10 & 7 & 43\text{s} & 934\text{s} & 48.2\textcolor{gray}{MB} & 472\textcolor{black}{GB} & 118.2m & 30 & \cite{cito2020empirical} \\
+\hspace{0.5em} \ttt{pass.sh} & & & 10 & & & 10 & 5 & 42\text{s} & 386\text{s} & 11.5\textcolor{gray}{MB} & 22.2\textcolor{black}{GB} & & &  \\
 \hspace{0.5em} \ldots & & & & & & & & & & & & & &  \\
 \bs{repl} & SA/MI & 3 & 586 & \multicolumn{2}{c}{N/A} & 19 & 53 & \textasciitilde 0 & 24\text{s} & 197\textcolor{gray}{MB} & 1.21\textcolor{black}{GB} & 5.6m & 79 & \cite{posh:atc:2020,vpsaudit} \\
-\hspace{0.5em} \ldots & & & & & & & & & & & & & &  \\
 \bs{unixfun} & MI/TP & 36 & 70 & 599\textcolor{gray}{MB} & 59.1\textcolor{black}{GB} & 4 & 12 & \textasciitilde 0 & 5\text{s} & 9.80\textcolor{gray}{MB} & 5.71\textcolor{black}{GB} & 944.0k & 733 & \cite{bhandari2020solutions} \\
+\hspace{0.5em} \ttt{1.sh} & & & 2 & & & 3 & 2 & \textasciitilde 0 & 50\text{ms} & 680\textcolor{gray}{KB} & 108\textcolor{gray}{MB} & & &  \\
 \hspace{0.5em} \ttt{2.sh} & & & 2 & & & 3 & 3 & \textasciitilde 0 & 260\text{ms} & 7.51\textcolor{gray}{MB} & 209\textcolor{gray}{MB} & & &  \\
 \hspace{0.5em} \ldots & & & & & & & & & & & & & &  \\
 \bs{weather} & DA/DE & 2 & 74 & 893\textcolor{gray}{MB} & 146\textcolor{black}{GB} & 11 & 20 & 260\text{ms} & 958\text{s} & 94.2\textcolor{gray}{MB} & 39.1\textcolor{black}{GB} & 56.7m & 50 & \cite{hadoop-guide-2009} \\
-\hspace{0.5em} \ldots & & & & & & & & & & & & & &  \\
 \bs{web-search} & MI/TP & 7 & 82 & 833\textcolor{gray}{MB} & 8.61\textcolor{black}{GB} & 16 & 39 & 11\text{s} & 1343\text{s} & 1.32\textcolor{black}{GB} & 17.1\textcolor{black}{GB} & 112.6m & 174 & \cite{csci1380} \\
-\hspace{0.5em} \ldots & & & & & & & & & & & & & &  \\
 \midrule
-{\textbf{\centering Min}} & & 1 & 20 & 4.00\textcolor{gray}{B} & 4.00\textcolor{gray}{B} & 4 & 1 & 0 & 5.4 & 224\textcolor{gray}{KB} & 135\textcolor{gray}{MB} & 944.0k & 10 & \\
-{\textbf{\centering Mean}} & & 7.8 & 302.6 & 2.80\textcolor{black}{GB} & 29.0\textcolor{black}{GB} & 13.1 & 31.5 & 9.1 & 815.9 & 2.47\textcolor{black}{GB} & 80.9\textcolor{black}{GB} & 50.1m & 200 & \\
-{\textbf{\centering Median}} & & 3.5 & 78 & 893\textcolor{gray}{MB} & 8.61\textcolor{black}{GB} & 13 & 21.5 & 0.1 & 218.2 & 198\textcolor{gray}{MB} & 20.1\textcolor{black}{GB} & 25.0m & 83.5 & \\
-{\textbf{\centering Max}} & & 36 & 2592 & 24.3\textcolor{black}{GB} & 146\textcolor{black}{GB} & 20 & 134 & 52 & 6720.9 & 25.1\textcolor{black}{GB} & 472\textcolor{black}{GB} & 178.6m & 885 & \\
+{\textbf{\centering Min}} & & 1 & 20 & 147\textcolor{gray}{KB} & 1.43\textcolor{gray}{MB} & 4 & 1 & \textasciitilde 0 & 5\text{s} & 224\textcolor{gray}{KB} & 135\textcolor{gray}{MB} & 944.0k & 10 & \\
+{\textbf{\centering Mean}} & & 7.8 & 302.6 & 2.98\textcolor{black}{GB} & 30.9\textcolor{black}{GB} & 13.1 & 31.5 & 9\text{s} & 815\text{s} & 2.47\textcolor{black}{GB} & 80.9\textcolor{black}{GB} & 50.1m & 200 & \\
+{\textbf{\centering Median}} & & 3.5 & 78 & 991\textcolor{gray}{MB} & 10.2\textcolor{black}{GB} & 13 & 21.5 & 79\text{ms} & 218\text{s} & 198\textcolor{gray}{MB} & 20.1\textcolor{black}{GB} & 25.0m & 83.5 & \\
+{\textbf{\centering Max}} & & 36 & 2592 & 24.3\textcolor{black}{GB} & 146\textcolor{black}{GB} & 20 & 134 & 51\text{s} & 6720\text{s} & 25.1\textcolor{black}{GB} & 472\textcolor{black}{GB} & 178.6m & 885 & \\
 
     \bottomrule
   \end{tabular}
-
