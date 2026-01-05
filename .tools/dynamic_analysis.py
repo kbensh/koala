@@ -12,10 +12,10 @@ from dataclasses import dataclass
 from project_root import get_project_root
 
 def correct_base(path):
-    return Path(path).is_relative_to('/benchmarks')
+    return Path(path).is_relative_to('/koala')
 
 def rebase(path):
-    return Path(path).relative_to('/benchmarks')
+    return Path(path).relative_to('/koala')
 
 def is_shell(pid, processes):
     a = next(iter(processes[pid].values()))
@@ -165,7 +165,7 @@ def print_statistics(pid, processes, parents, children, mortem):
     tis_system += stat_zombie.stime # we have a more accurate measurement of the first process
 
     input_files = set(p for d in descendents for r in processes[d].values() for p in get_input_files(r)) 
-    if mortem.input_file is not None:
+    if mortem.input_file is not None and correct_base(mortem.input_file):
         input_files |= {mortem.input_file}
     input_files = list(str(rebase(p)) for p in input_files)
 

@@ -58,7 +58,6 @@ def perform_pca_and_plot(dataframe1, dataframe2, path='pca.pdf'):
         )
         with pd.option_context('display.max_columns', None):
             print(loading_df)
-            exit()
 
         return pca_df, benchmark_names
 

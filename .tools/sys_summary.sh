@@ -2,32 +2,23 @@
 
 SAMPLING_INT=1
 CSV_HEADER="Benchmark,Sys Calls,FD_Snapshot,Unique_FD,Peak_FD"
+BENCHMARK_TIMEOUT="12000s"
 
-output_file="benchmark_results.csv"
+output_file="newbenchmark_results.csv"
 
-default_benchmarks=(
-  "analytics"
-  "bio"  
-  "ci-cd"
-  "covid"
-  "file-mod"
-  "inference"
-  "ml"
-  "nlp"
-  "oneliners"
-  "pkg"
-  "repl"
-  "unixfun"
-  "weather"
-  "web-search"
-)
-
+default_benchmarks=("net")
 benchmarks=()
 args=()
 
+found_separator=false
+
 for arg in "$@"; do
-    if [[ "$arg" == --* ]]; then
+    if [[ "$found_separator" == "true" ]]; then
+        # Everything after '--' goes into args
         args+=("$arg")
+    elif [[ "$arg" == "--" ]]; then
+        # Found the separator, flip the flag
+        found_separator=true
     else
         benchmarks+=("$arg")
     fi
@@ -38,7 +29,9 @@ done
 echo "$CSV_HEADER" > "$output_file"
 
 for benchmark in "${benchmarks[@]}"; do
+    echo "------------------------------------------------"
     echo "Running benchmark: $benchmark"
+    echo "Passing args to inner scripts: ${args[*]}"
 
     mkdir -p "/tmp/${benchmark}"
     strace_out="/tmp/${benchmark}_strace.txt"
@@ -50,37 +43,74 @@ for benchmark in "${benchmarks[@]}"; do
         continue
     fi
 
+    # 1. Install & Fetch
+    echo "  -> Installing..."
     ./install.sh || { echo "$benchmark,FAIL: install.sh" >> "../$output_file"; cd - >/dev/null; continue; }
+    echo "  -> Fetching..."
+    # Pass the captured args to fetch.sh
     ./fetch.sh "${args[@]}" || { echo "$benchmark,FAIL: fetch.sh" >> "../$output_file"; cd - >/dev/null; continue; }
 
-    setsid ./execute.sh "${args[@]}" &
+    # 2. RUN 1: LSOF Metric (Background)
+    echo "  -> Executing Run 1 (LSOF capture) with ${BENCHMARK_TIMEOUT} timeout..."
+    
+    # Run in new session so we can track PGID
+    # Pass the captured args to execute.sh
+    setsid timeout "$BENCHMARK_TIMEOUT" ./execute.sh "${args[@]}" &
     pid=$!
+    
+    # Give it a moment to start
     sleep 1
+    
+    # Get PGID (Process Group ID) to track child processes
     pgid=$(ps -o pgid= -p "$pid" | tr -d ' ')
 
-    [[ -z $pgid ]] && { echo "$benchmark,FAIL: no PGID" >> "../$output_file"; cd - >/dev/null; continue; }
+    if [[ -z $pgid ]]; then
+        echo "  -> Process finished too quickly or failed to start."
+    else
+        # Start LSOF Sampler on the Process Group
+        lsof -n -P -w -g "$pgid" -r${SAMPLING_INT} > "$stream_out" &
+        sampler_pid=$!
+        
+        # Take a snapshot
+        lsof -n -P -w -g "$pgid" > "$snap_out" 2>/dev/null
+    fi
 
-    lsof -n -P -w -g "$pgid" -r${SAMPLING_INT} > "$stream_out" &
-    sampler_pid=$!
-
-    lsof -n -P -w -g "$pgid" > "$snap_out" || echo "Warning: lsof snapshot failed"
-
+    # Wait for the benchmark to finish (or timeout)
     wait "$pid"
-    kill "$sampler_pid" 2>/dev/null
+    
+    # Clean up sampler
+    if [[ -n $sampler_pid ]]; then
+        kill "$sampler_pid" 2>/dev/null
+        wait "$sampler_pid" 2>/dev/null
+    fi
 
-    strace -c -f -o "$strace_out" ./execute.sh "${args[@]}" || {
-        echo "$benchmark,FAIL: strace" >> "../$output_file"; cd - >/dev/null; continue; }
+    # 3. RUN 2: Strace Metric (Foreground)
+    echo "  -> Executing Run 2 (Strace) with ${BENCHMARK_TIMEOUT} timeout..."
+    
+    # Run strace with timeout.
+    # Pass the captured args to execute.sh
+    timeout "$BENCHMARK_TIMEOUT" strace -c -f -o "$strace_out" ./execute.sh "${args[@]}" 
+    exit_code=$?
 
-    syscalls=$(awk '/^100\.00/ {print $4}' "$strace_out")
+    if [ $exit_code -eq 124 ]; then
+        echo "  -> WARNING: Run 2 timed out."
+    elif [ $exit_code -ne 0 ]; then
+         echo "$benchmark,FAIL: strace run failed" >> "../$output_file"
+         cd - >/dev/null
+         continue
+    fi
 
-    FD_Snapshot=$(awk 'NR>1' "$snap_out" | wc -l)
-    Unique_FD=$(awk 'NR>1 {print $4":"$10}' "$snap_out" | sort -u | wc -l)
+    # 4. Parse Results
+    syscalls=$(grep "100.00" "$strace_out" | awk '{print $4}')
+    
+    FD_Snapshot=$(awk 'NR>1' "$snap_out" 2>/dev/null | wc -l)
+    Unique_FD=$(awk 'NR>1 {print $4":"$10}' "$snap_out" 2>/dev/null | sort -u | wc -l)
 
     if [[ -s "$stream_out" ]]; then
         Peak_FD=$(awk '
             NF && $1!="COMMAND" {seen[$4":"$10]++}
             /^====/             {print length(seen); delete seen}
-        ' "$stream_out" | awk 'max<$1{max=$1} END{print max}')
+        ' "$stream_out" | awk 'max<$1{max=$1} END{print max+0}') 
     else
         Peak_FD=0
     fi
@@ -88,8 +118,11 @@ for benchmark in "${benchmarks[@]}"; do
     echo "${benchmark%,/},${syscalls:-0},${FD_Snapshot:-0},${Unique_FD:-0},${Peak_FD:-0}" \
      >> "../$output_file"
 
+    # Cleanup
     rm -f "$strace_out" "$snap_out" "$stream_out"
     cd - >/dev/null
+    
+    echo "  -> Completed."
 done
 
 echo "Benchmark results saved to $output_file."

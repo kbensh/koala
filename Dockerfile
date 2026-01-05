@@ -1,6 +1,6 @@
 FROM debian:12.7
 
-WORKDIR /benchmarks
+WORKDIR /koala
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     sudo \
@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gpg
 
 COPY . .
-RUN chmod +x /benchmarks/main.sh
+RUN chmod +x /koala/main.sh
 
 ENV LC_ALL=C
 ENV TC=UTC
@@ -21,16 +21,16 @@ ENV TC=UTC
 RUN printf '#!/bin/sh\nexec "$@"\n' > /tmp/sudo && chmod +x /tmp/sudo
 ENV PATH="/tmp:$PATH"
 
-RUN git config --global --add safe.directory /benchmarks
+RUN git config --global --add safe.directory /koala
 
-RUN /benchmarks/setup.sh
+RUN /koala/setup.sh
 
 ARG BENCHMARK_INSTALLS="yes"
 
 # Run install.sh for each benchmark
 RUN  if [ "$BENCHMARK_INSTALLS" = "yes" ]; then \
     set -eux; \
-    for bench in /benchmarks/*; do \
+    for bench in /koala/*; do \
         if [ -f "$bench/install.sh" ]; then \
             echo "Running install.sh in $bench"; \
             chmod +x "$bench/install.sh"; \
