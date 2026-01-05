@@ -25,7 +25,7 @@ def read_sys_results():
 
 benchmark_category_style = {
     'analytics': ('System admin.', 'Data analysis', '\\cite{dgsh:ieee:2017,posh:atc:2020,drake2014command}'),
-    'bio': ('Data analysis', 'Biology', '\\cite{Cappellini2019,puritz2019bio594,ibrahim2021tera}'),
+    'bio': ('Data analysis', 'Bio Informatics', '\\cite{Cappellini2019,puritz2019bio594,ibrahim2021tera}'),
     'ci-cd': ('Continuous Integration', 'Build scripts', '\\cite{riker2022,makeself}'),
     'covid': ('Data analysis', 'Data extraction', '\\cite{covid-mts-source}'),
     'edgy': ('Misc. Idk', 'Misc. Idk', '\\cite{mcilroy2014coroutine,hs:hotos:2023}'),
