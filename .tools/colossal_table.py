@@ -98,6 +98,7 @@ benchmark_input_override = {
     'ci-cd': { 'small': None, 'full': None },
     'pkg': { 'small': f'{(100 + 10)} pkgs', 'full': f'{roundk(1768 + 195)}k pkgs' },
     'repl': { 'small': None, 'full': None },
+    'edgy': { 'small': None, 'full': None },
     'nlp': { 'small': f'{roundk(3000)}k bks', 'full': f'{roundk(115916)}k bks' },
 }
 
@@ -106,11 +107,15 @@ scripts_to_include = [
     'analytics/scripts/nginx.sh',
     'bio/scripts/bio.sh',
     'bio/scripts/data.sh',
-    'ci-cd/makeself/test/lsmtest/lsmtest.sh'
+    'ci-cd/makeself/test/lsmtest/lsmtest.sh',
     'ci-cd/riker/redis/build.sh',
     'covid/scripts/1.sh',
+    'edgy/scripts/sieve.sh',
+    'edgy/scripts/try.sh',
     'file-mod/scripts/encrypt_files.sh',
     'file-mod/scripts/img_convert.sh',
+    'interact/scripts/shnake.sh',
+    'net/scripts/ping.sh',
     'nlp/scripts/bigrams.sh',
     'oneliners/scripts/spell.sh',
     'oneliners/scripts/top-n.sh',
@@ -118,6 +123,7 @@ scripts_to_include = [
     'pkg/scripts/pacaur.sh',
     'pkg/scripts/proginf.sh',
     # 'repl/scripts/vps-audit.sh',
+    'rand/scripts/pass.sh',
     'unixfun/scripts/1.sh',
     'unixfun/scripts/2.sh',
     # 'weather/scripts/temp-analytics.sh',
@@ -308,7 +314,6 @@ def main():
     \\begin{tabular}{@{}llrrrrrrrrrrrrl@{}}
     \\toprule
     \\multirow{2}{*}{Benchmark/Script} & \\multicolumn{3}{c}{Surface} & \\multicolumn{2}{c}{Inputs} & \\multicolumn{2}{c}{Syntax} & \\multicolumn{4}{c}{Dynamic} & \\multicolumn{2}{c}{System} & \\multirow{2}{*}{Source} \\\\
-        \\cline{2-4} \\cline{5-6} \\cline{7-8} \\cline{9-12} \\cline{13-14}
                                       & \multicolumn{1}{c}{\\Dom}  & \\#.sh     & LoC     & Small & Full & \\#Cons & \\#Cmd & $t_{S}$  & $t_{C}$  & Mem   & I/O & \\#SC & \\#FD &   \\\\
         \\midrule
     """)
@@ -324,7 +329,7 @@ def main():
                 # all columns except leave blank benchmark, category, number of scripts, input description
                 print(f"\\hspace{{0.5em}} \\ttt{{{script_name(row_script['script'].split('/')[-1])}}} & & & {row_script['loc']} & & & {row_script['constructs']} & {row_script['unique_cmds']} & {format_time(row_script['time_in_shell'])} & {format_time(row_script['time_in_commands'])} & {prettify_bytes_number(row_script['max_unique_set_size'])} & {prettify_bytes_number(row_script['io_chars'])} & & & {script_citation(row_script['script'])} \\\\")
                 numscripts_shown += 1
-        if numscripts_shown < numscripts and numscripts > 1:
+        if numscripts_shown > 0 and numscripts_shown < numscripts:
             print(f"\\hspace{{0.5em}} \\ldots & & & & & & & & & & & & & & {script_citation(row['benchmark'] + '...')} \\\\")
 
     print("\\midrule")
@@ -340,7 +345,7 @@ def main():
                 return round_whole(f"{value:.1f}") if isinstance(value, float) else f"{int(value)}"
             return value  # For non-numeric values
 
-        print(f"{{\\textbf{{\\centering {row['benchmark']}}}}} & & {format_value(row['number_of_scripts'])} & {format_value(row['loc'])} & {prettify_bytes_number(row['input_size_small'])} & {prettify_bytes_number(row['input_size_full'])} & {format_value(row['constructs'])} & {format_value(row['unique_cmds'])} & {format_value(row['time_in_shell'])} & {format_value(row['time_in_commands'])} & {prettify_bytes_number(row['max_unique_set_size'])} & {prettify_bytes_number(row['io_chars'])} & {prettify_big_count(row['sys_calls'])} & {format_value(row['file_descriptors'])} & \\\\")
+        print(f"{{\\textbf{{\\centering {row['benchmark']}}}}} & & {format_value(row['number_of_scripts'])} & {format_value(row['loc'])} & {prettify_bytes_number(row['input_size_small'])} & {prettify_bytes_number(row['input_size_full'])} & {format_value(row['constructs'])} & {format_value(row['unique_cmds'])} & {format_time(row['time_in_shell'])} & {format_time(row['time_in_commands'])} & {prettify_bytes_number(row['max_unique_set_size'])} & {prettify_bytes_number(row['io_chars'])} & {prettify_big_count(row['sys_calls'])} & {format_value(row['file_descriptors'])} & \\\\")
 
     print("""
     \\bottomrule
