@@ -34,8 +34,8 @@ covid/scripts/2.sh,covid
 covid/scripts/3.sh,covid
 covid/scripts/4.sh,covid
 covid/scripts/5.sh,covid
-edgy/scripts/sieve.sh,edgy
-edgy/scripts/try.sh,edgy
+etcetera/scripts/sieve.sh,etcetera
+etcetera/scripts/try.sh,etcetera
 file-mod/scripts/compress_files.sh,file-mod
 file-mod/scripts/encrypt_files.sh,file-mod
 file-mod/scripts/img_convert.sh,file-mod

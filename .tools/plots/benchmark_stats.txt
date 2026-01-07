@@ -53,7 +53,7 @@ Time in Shell: 0.00 sec
 Time in Commands: 67.93 sec
 ==================================================
 
-Benchmark: edgy
+Benchmark: etcetera
 --------------------------------------------------
 Total CPU time: 71.22 sec
 Total Wall time: 63.26 sec

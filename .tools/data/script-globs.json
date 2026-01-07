@@ -48,8 +48,8 @@
          "web-search/scripts/query.sh",
          "web-search/scripts/c/*.sh"]
     },
-    "edgy": {
-        "scripts": ["edgy/scripts/*.sh"]
+    "etcetera": {
+        "scripts": ["etcetera/scripts/*.sh"]
     },
     "interact": {
         "scripts": ["interact/scripts/*.sh"]

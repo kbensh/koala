@@ -19,7 +19,7 @@
 \bs{covid} & DA/DE & 5 & 53 & 3.34\textcolor{black}{GB} & 5.08\textcolor{black}{GB} & 5 & 6 & \textasciitilde 0 & 67\text{s} & 1011\textcolor{gray}{MB} & 80.6\textcolor{black}{GB} & 14.3m & 150 & \cite{covid-mts-source} \\
 \hspace{0.5em} \ttt{1.sh} & & & 9 & & & 5 & 6 & \textasciitilde 0 & 12\text{s} & 13.2\textcolor{gray}{MB} & 17.5\textcolor{black}{GB} & & &  \\
 \hspace{0.5em} \ldots & & & & & & & & & & & & & &  \\
-\bs{edgy} & MI/MI & 2 & 193 & \multicolumn{2}{c}{N/A} & 20 & 43 & 20\text{ms} & 71\text{s} & 15.8\textcolor{gray}{MB} & 26.2\textcolor{black}{GB} & 7.1m & 141 & \cite{mcilroy2014coroutine,hs:hotos:2023} \\
+\bs{etcetera} & MI/MI & 2 & 193 & \multicolumn{2}{c}{N/A} & 20 & 43 & 20\text{ms} & 71\text{s} & 15.8\textcolor{gray}{MB} & 26.2\textcolor{black}{GB} & 7.1m & 141 & \cite{mcilroy2014coroutine,hs:hotos:2023} \\
 \hspace{0.5em} \ttt{sieve.sh} & & & 45 & & & 15 & 21 & 20\text{ms} & 71\text{s} & 15.8\textcolor{gray}{MB} & 26.2\textcolor{black}{GB} & & &  \\
 \hspace{0.5em} \ttt{try.sh} & & & 148 & & & 17 & 29 & \textasciitilde 0 & 30\text{ms} & 1.65\textcolor{gray}{MB} & 1.05\textcolor{gray}{MB} & & &  \\
 \bs{file-mod} & AN/MI & 5 & 41 & 4.35\textcolor{black}{GB} & 39.2\textcolor{black}{GB} & 11 & 10 & 99\text{ms} & 235\text{s} & 164\textcolor{gray}{MB} & 13.9\textcolor{black}{GB} & 1.5m & 61 & \cite{cito2020empirical,dgsh:ieee:2017,posh:atc:2020} \\
@@ -27,7 +27,7 @@
 \hspace{0.5em} \ttt{img-conv.sh} & & & 11 & & & 11 & 6 & 99\text{ms} & 170\text{s} & 145\textcolor{gray}{MB} & 3.83\textcolor{black}{GB} & & &  \\
 \hspace{0.5em} \ldots & & & & & & & & & & & & & &  \\
 \bs{inference} & ML/DA & 3 & 60 & 3.85\textcolor{black}{GB} & 11.7\textcolor{black}{GB} & 15 & 27 & 40\text{ms} & 1586\text{s} & 7.16\textcolor{black}{GB} & 83.7\textcolor{black}{GB} & 37.9m & 81 & \cite{lamprou2025foundation,tunney2023bash} \\
-\bs{interact} & SA/MI & 2 & 96 & 14.9\textcolor{gray}{MB} & 14.9\textcolor{gray}{MB} & 17 & 20 & 33\text{s} & 292\text{s} & 224\textcolor{gray}{KB} & 5.58\textcolor{black}{GB} & 154.0m & 14 & \cite{shnake,ohmyzsh} \\
+\bs{interact} & SA/MI & 2 & 96 & 11.1\textcolor{gray}{MB} & 14.9\textcolor{gray}{MB} & 17 & 20 & 33\text{s} & 292\text{s} & 224\textcolor{gray}{KB} & 5.58\textcolor{black}{GB} & 154.0m & 14 & \cite{shnake,ohmyzsh} \\
 \bs{ml} & ML/DA & 1 & 47 & 4.71\textcolor{black}{GB} & 15.0\textcolor{black}{GB} & 7 & 1 & \textasciitilde 0 & 1156\text{s} & 7.87\textcolor{black}{GB} & 41.6\textcolor{black}{GB} & 14.9m & 10 & \cite{scikit-learn} \\
 \bs{net} & NW/SA & 3 & 146 & 147\textcolor{gray}{KB} & 1.43\textcolor{gray}{MB} & 18 & 39 & 339\text{ms} & 8\text{s} & 42.5\textcolor{gray}{MB} & 135\textcolor{gray}{MB} & 3.4m & 83 & \cite{Nemeth2017-uf} \\
 \hspace{0.5em} \ttt{ping.sh} & & & 20 & & & 14 & 8 & 130\text{ms} & 510\text{ms} & 768\textcolor{gray}{KB} & 6.43\textcolor{gray}{MB} & & &  \\
