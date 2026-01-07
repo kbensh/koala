@@ -1,7 +1,7 @@
 #!/bin/bash
 
 TOP=$(git rev-parse --show-toplevel)
-eval_dir="${TOP}/edgy"
+eval_dir="${TOP}/etcetera"
 hashes_dir="${eval_dir}/hashes"
 outputs_dir="${eval_dir}/outputs"
 mkdir -p "${outputs_dir}"

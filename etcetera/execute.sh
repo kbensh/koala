@@ -1,7 +1,7 @@
 #!/bin/bash
 
 TOP=$(git rev-parse --show-toplevel)
-eval_dir="${TOP}/edgy"
+eval_dir="${TOP}/etcetera"
 input_dir="${eval_dir}/inputs"
 scripts_dir="${eval_dir}/scripts"
 outputs_dir="${eval_dir}/outputs"
@@ -41,7 +41,7 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-export BENCHMARK_CATEGORY="edgy"
+export BENCHMARK_CATEGORY="etcetera"
 KOALA_SHELL=${KOALA_SHELL:-bash}
 
 should_run() {
@@ -74,7 +74,7 @@ if should_run "try"; then
     export BENCHMARK_INPUT_FILE
     BENCHMARK_SCRIPT="$(realpath "$scripts_dir/try.sh")"
     export BENCHMARK_SCRIPT
-    $KOALA_SHELL "$scripts_dir/try.sh" -y "mkdir -p /tmp/lib/edgy/test && echo 'works' > /tmp/lib/edgy/test/try_status.txt" > "$outputs_dir/try_out.txt"
-    mv /tmp/lib/edgy/test/try_status.txt $outputs_dir
+    $KOALA_SHELL "$scripts_dir/try.sh" -y "mkdir -p /tmp/lib/etcetera/test && echo 'works' > /tmp/lib/etcetera/test/try_status.txt" > "$outputs_dir/try_out.txt"
+    mv /tmp/lib/etcetera/test/try_status.txt $outputs_dir
     echo $?
 fi
