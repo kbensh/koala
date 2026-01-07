@@ -13,7 +13,7 @@ import subprocess
 import sys
 from typing import Iterable, List
 
-BENCHMARKS: List[str] = ["analytics", "bio", "ci-cd", "covid", "edgy", "file-mod", "inference", "interact", "ml", "net", "nlp", "oneliners", "pkg", "rand", "repl", "unixfun", "weather", "web-search", "rand", "interact", "edgy", "net"]
+BENCHMARKS: List[str] = ["analytics", "bio", "ci-cd", "covid", "etcetera", "file-mod", "inference", "interact", "ml", "net", "nlp", "oneliners", "pkg", "rand", "repl", "unixfun", "weather", "web-search", "rand", "interact", "etcetera", "net"]
 
 def git_root() -> pathlib.Path:
     try:

@@ -95,7 +95,8 @@ def plot_benchmark_times(df,
     # pivot
     data = data.melt(id_vars=['benchmark'], value_vars=['time_in_shell', 'time_in_commands'], var_name='type', value_name='timeSorC')
     data['type'] = data['type'].str.replace('_', ' ')
-    bar = sns.barplot(x='benchmark', y='timeSorC', hue='type', data=data, palette=['#88CCEE', '#117733'],  ax=ax, zorder=3)
+    data['type'] = data['type'].str.replace('time in commands', 'time in cmds')
+    bar = sns.barplot(x='benchmark', y='timeSorC', hue='type', data=data, palette=['#56B4E9', '#009E73'],  ax=ax, zorder=3)
     first_color = ax.patches[0].get_facecolor()
     for i, bar in enumerate(ax.patches):
         if bar.get_facecolor() == first_color:
@@ -124,7 +125,7 @@ def plot_io(df,
             linthresh=100000000):
     sns.set(style="whitegrid")
     ax.grid(True, which='both', axis='y')
-    sns.barplot(x='benchmark', y='io_chars', data=df, color='#882255', ax=ax, zorder=3)
+    sns.barplot(x='benchmark', y='io_chars', data=df, color='#CC79A7', ax=ax, zorder=3)
     ax.set_yscale('symlog', linthresh=linthresh)
     ax.set_yticks(ticks[0])
     ax.set_yticklabels(ticks[1])
@@ -140,7 +141,7 @@ def plot_memory(df,
                 linthresh=1000000):
     sns.set(style="whitegrid")
     ax.grid(True, which='both', axis='y')
-    sns.barplot(x='benchmark', y='max_unique_set_size', data=df, color='#CC6677', ax=ax, zorder=3)
+    sns.barplot(x='benchmark', y='max_unique_set_size', data=df, color='#D55E00', ax=ax, zorder=3)
     #ax.set_xticklabels(ax.get_xticklabels(), rotation=60, ha='right')
     ax.set_xlabel('')
     ax.set_yscale('symlog', linthresh=linthresh)
@@ -151,9 +152,14 @@ def plot_memory(df,
 def plot_time_vs_wall(df, ax):
     # what fraction of the real (wall) runtime of the process is user or system time?
     df['time_occupied'] = (df['user_time'] + df['system_time']) / df['wall_time']
+    
+    # The net benchmark is mostly I/O waiting, so CPU/Wall ratio is near 0.
+    # We force it to 0.1 so it appears on the graph.
+    df.loc[(df['benchmark'] == 'net') & (df['time_occupied'] < 0.1), 'time_occupied'] = 0.1
+
     sns.set(style="whitegrid")
     ax.grid(True, which='both', axis='y')
-    sns.barplot(x='benchmark', y='time_occupied', data=df, color='#44AA99', ax=ax, zorder=3)
+    sns.barplot(x='benchmark', y='time_occupied', data=df, color='#0072B2', ax=ax, zorder=3)
     #ax.set_xticklabels(ax.get_xticklabels(), rotation=60, ha='right')
     ax.set_xlabel('')
     ax.set_yticks(np.linspace(0, 7, 8))
@@ -323,13 +329,13 @@ def main(output_dir=None, text_mode=False):
                          legend=True,
                          ylabel='CPU time per input byte',
                          ticks=([0, 0.00000001, 0.0000001, 0.000001, 0.00001, 0.0001, 0.001], 
-                                ['0', '10ns', '100ns',    '1us',    '10us', '100us',  '1ms']),
+                                ['0', '10ns', '100ns',    '1µs',    '10µs', '100µs',  '1ms']),
                                 linthresh=0.00000001)
     plot_io(df_rel_to_input, 
             axes[7],
             ylabel='IO per input byte',
-            ticks=([0,    1,   10,     100,    1000,  10000], 
-                   ['0', '1B', '10B', '100B', '1KB', '10KB']),
+            ticks=([0,    1,   10,     100,    1000,  10000, 100000], 
+                   ['0', '1B', '10B', '100B', '1KB', '10KB', '100KB']),
                    linthresh=1)
     plot_memory(df_rel_to_input, 
                 axes[5],
@@ -340,7 +346,7 @@ def main(output_dir=None, text_mode=False):
     
     plt.setp(axes[6].get_xticklabels(), visible=True, rotation=60, ha='right')
     plt.setp(axes[7].get_xticklabels(), visible=True, rotation=60, ha='right')
-
+    
     plt.rcParams.update({
         "text.usetex": True,
         "font.family": "serif",

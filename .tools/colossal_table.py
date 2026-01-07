@@ -28,7 +28,7 @@ benchmark_category_style = {
     'bio': ('Data analysis', 'Bio Informatics', '\\cite{Cappellini2019,puritz2019bio594,ibrahim2021tera}'),
     'ci-cd': ('Continuous Integration', 'Build scripts', '\\cite{riker2022,makeself}'),
     'covid': ('Data analysis', 'Data extraction', '\\cite{covid-mts-source}'),
-    'edgy': ('Misc. Idk', 'Misc. Idk', '\\cite{mcilroy2014coroutine,hs:hotos:2023}'),
+    'etcetera': ('Misc. Idk', 'Misc. Idk', '\\cite{mcilroy2014coroutine,hs:hotos:2023}'),
     'file-mod': ('Automation Now', 'Misc. Idk', '\\cite{cito2020empirical,dgsh:ieee:2017,posh:atc:2020}'),
     'inference': ('Machine learning', 'Data analysis', '\\cite{lamprou2025foundation,tunney2023bash}'),
     'interact': ('System admin.', 'Misc. Idk', '\\cite{shnake,ohmyzsh}'),
@@ -79,7 +79,7 @@ benchmark_input_description = {
     'weather': 'temperature data',
     'web-search': 'root webpages',
     'rand': '\\xxx',
-    'edgy': '\\xxx',
+    'etcetera': '\\xxx',
     'interact': '\\xxx',
     'net': '\\xxx',
 }
@@ -98,7 +98,7 @@ benchmark_input_override = {
     'ci-cd': { 'small': None, 'full': None },
     'pkg': { 'small': f'{(100 + 10)} pkgs', 'full': f'{roundk(1768 + 195)}k pkgs' },
     'repl': { 'small': None, 'full': None },
-    'edgy': { 'small': None, 'full': None },
+    'etcetera': { 'small': None, 'full': None },
     'nlp': { 'small': f'{roundk(3000)}k bks', 'full': f'{roundk(115916)}k bks' },
 }
 
@@ -110,8 +110,8 @@ scripts_to_include = [
     'ci-cd/makeself/test/lsmtest/lsmtest.sh',
     'ci-cd/riker/redis/build.sh',
     'covid/scripts/1.sh',
-    'edgy/scripts/sieve.sh',
-    'edgy/scripts/try.sh',
+    'etcetera/scripts/sieve.sh',
+    'etcetera/scripts/try.sh',
     'file-mod/scripts/encrypt_files.sh',
     'file-mod/scripts/img_convert.sh',
     'net/scripts/ping.sh',
