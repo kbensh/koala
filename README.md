@@ -4,7 +4,7 @@
 > For issues and ideas, [open a GitHub issue](https://github.com/binpash/benchmarks/issues/new/choose).
 
 Koala is a benchmark suite aimed at the characterization of performance-oriented research targeting the POSIX shell.
-It consists of 14 sets of real-world shell programs from diverse domains ranging from CI/CD and AI/ML to biology and the humanities. They are accompanied by real inputs that facilitate small- and large-scale performance characterization and varying opportunities for optimization.
+It consists of 18 sets of real-world shell programs from diverse domains ranging from CI/CD and AI/ML to biology and the humanities. They are accompanied by real inputs that facilitate small- and large-scale performance characterization and varying opportunities for optimization.
 
 If any aspect of Koala is useful, please cite the [ATC'25 Koala paper](https://www.usenix.org/conference/atc25/presentation/lamprou):
 
@@ -36,12 +36,16 @@ Please explore the individual benchmark directories for more details on their sp
 | `bio`       | performs genomic and transcriptomic analysis using population and RNA-seq data. |
 | `ci-cd`     | builds and tests open-source software projects.                             |
 | `covid`     | analyzes public transit activity during the covid-19 pandemic.              |
+| `etcetera`  | generates primes via a sieve and runs commands inside an overlay sandbox.   |
 | `file-mod`  | compresses, encrypts, and converts various file formats.                    |
 | `inference` | runs media-related inference tasks using large foundation models.           |
+| `interact`  | exercises interactive shell programs (oh-my-zsh installer, snake game).     |
 | `ml`        | implements a full machine learning pipeline using scikit-learn.             |
+| `net`       | performs network reconnaissance and firewall configuration tasks.           |
 | `nlp`       | processes books using shell-based nlp pipelines from unix for poets.        |
 | `oneliners` | executes classic and modern one-liner shell pipelines.                      |
 | `pkg`       | builds aur packages and analyzes npm packages for permissions.              |
+| `rand`      | generates random passwords and samples random teams from name lists.        |
 | `repl`      | performs security auditing and git-based development workflow replay.       |
 | `unixfun`   | solves unix text-processing problems from the 50-year anniversary challenge.|
 | `weather`   | computes and visualizes historical weather statistics.                      |
