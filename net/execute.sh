@@ -69,8 +69,6 @@ setup_namespace() {
     $SUDO ip netns exec "$NETNS_NAME" ip addr add 10.200.1.2/24 dev "$VETH_NS"
     $SUDO ip netns exec "$NETNS_NAME" ip link set "$VETH_NS" up
 
-    # CRITICAL FIX: Wait for link carrier to be ready before adding routes
-    # "Nexthop has invalid gateway" occurs because the link isn't fully up yet
     sleep 0.5
 
     $SUDO ip netns exec "$NETNS_NAME" ip route add default via 10.200.1.1
@@ -160,8 +158,8 @@ if should_run "portscan"; then
     pkill -f "nc -l -p 5555" 2>/dev/null
     pkill -f "nc -l -p 6666" 2>/dev/null
     
-    if [ -f "$outputs_dir/portscan_output.txt" ]; then
-        $SUDO chown $(id -u):$(id -g) "$outputs_dir/portscan_output.txt"
+    if [ -f "$outputs_dir/portscan.txt" ]; then
+        $SUDO chown $(id -u):$(id -g) "$outputs_dir/portscan.txt"
     fi
 
     echo $exit_code
@@ -181,18 +179,26 @@ if should_run "accept-ips"; then
     # Setup the namespace specifically for this test
     setup_namespace
     
-    export BENCHMARK_INPUT_FILE="$input_dir/ips_$size.txt"
-    export BENCHMARK_SCRIPT="$(realpath "$scripts_dir/accept-ips.sh")"
-    
-    # Execute script inside the namespace
-    $SUDO ip netns exec "$NETNS_NAME" env \
-        BENCHMARK_INPUT_FILE="$BENCHMARK_INPUT_FILE" \
-        BENCHMARK_SCRIPT="$BENCHMARK_SCRIPT" \
-        KOALA_SHELL="$KOALA_SHELL" \
-        LC_ALL=C \
-        $KOALA_SHELL "$scripts_dir/accept-ips.sh" "$input_dir/ips_$size.txt" "$outputs_dir/accept-ips_$size.txt"
-    
-    echo $?
+    if $SUDO ip netns exec "$NETNS_NAME" true 2>/dev/null; then
+        export BENCHMARK_INPUT_FILE="$input_dir/ips_$size.txt"
+        export BENCHMARK_SCRIPT="$(realpath "$scripts_dir/accept-ips.sh")"
+
+        # Execute script inside the namespace
+        $SUDO ip netns exec "$NETNS_NAME" env \
+            BENCHMARK_INPUT_FILE="$BENCHMARK_INPUT_FILE" \
+            BENCHMARK_SCRIPT="$BENCHMARK_SCRIPT" \
+            KOALA_SHELL="$KOALA_SHELL" \
+            LC_ALL=C \
+            $KOALA_SHELL "$scripts_dir/accept-ips.sh" "$input_dir/ips_$size.txt" "$outputs_dir/accept-ips_$size.txt"
+
+        echo $?
+    else
+        echo "Error: cannot execute inside network namespace '$NETNS_NAME'." >&2
+        echo "       accept-ips needs CAP_NET_ADMIN and CAP_SYS_ADMIN: run as root," >&2
+        echo "       or in a rootful container (e.g. 'sudo podman run --privileged')." >&2
+        echo "       Rootless containers cannot mount sysfs in a new netns." >&2
+        echo 1
+    fi
     
     cleanup_namespace
 fi

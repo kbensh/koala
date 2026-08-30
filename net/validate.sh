@@ -2,7 +2,7 @@
 
 
 TOP=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD/..")
-eval_dir="${TOP}/networking"
+eval_dir="${TOP}/net"
 input_dir="${eval_dir}/inputs"
 scripts_dir="${eval_dir}/scripts"
 outputs_dir="${eval_dir}/outputs"
@@ -40,6 +40,8 @@ should_run() {
     return 1
 }
 
+# main.sh reads "<name> <0|1>" from stdout to decide pass/fail, and treats a
+# non-zero exit as "could not verify at all" -- so always exit 0 from here.
 report() {
     name=$1
     status=$2
@@ -51,6 +53,75 @@ report() {
         ANY_FAIL=1
     fi
 }
+
+if should_run "portscan"; then
+    portscan_out="$outputs_dir/portscan.txt"
+    portscan_status=0
+
+    if [ ! -s "$portscan_out" ]; then
+        echo "ERROR [portscan]: Output file '$portscan_out' is missing or empty" >&2
+        portscan_status=1
+    fi
+
+    if [ $portscan_status -eq 0 ] &&
+       grep -qE "command not found|Permission denied|DIAGNOSTIC INFO" "$portscan_out"; then
+        echo "ERROR [portscan]: Scan reported an error or discovered no open ports" >&2
+        portscan_status=1
+    fi
+
+    # execute.sh holds listeners open on 4444/5555/6666 for the duration of the
+    # scan, so a working scan of 127.0.0.1 must report all three as open.
+    if [ $portscan_status -eq 0 ]; then
+        for port in 4444 5555 6666; do
+            if ! grep -qE "^${port}/tcp[[:space:]]+open" "$portscan_out"; then
+                echo "ERROR [portscan]: Expected open port $port not found in report" >&2
+                portscan_status=1
+                break
+            fi
+        done
+    fi
+
+    report "portscan" $portscan_status
+fi
+
+if should_run "ping"; then
+    ping_out="$outputs_dir/ping_$size.txt"
+    ping_in="$input_dir/ping_$size.txt"
+    ping_status=0
+
+    if [ ! -s "$ping_out" ]; then
+        echo "ERROR [ping]: Output file '$ping_out' is missing or empty" >&2
+        ping_status=1
+    fi
+
+    if [ $ping_status -eq 0 ] && ! grep -q "is UP" "$ping_out"; then
+        echo "ERROR [ping]: No 'is UP' markers found in output (no hosts detected)" >&2
+        ping_status=1
+    fi
+
+    # execute.sh sweeps the 127.0.0 subnet, so loopback answers regardless of
+    # what the host's external network can actually reach.
+    if [ $ping_status -eq 0 ] && ! grep -q "127.0.0.1 is UP" "$ping_out"; then
+        echo "ERROR [ping]: Localhost 127.0.0.1 not detected as UP" >&2
+        echo "DEBUG [ping]: Checking what hosts were found..." >&2
+        grep "is UP" "$ping_out" >&2 || echo "DEBUG [ping]: No UP hosts in output" >&2
+        ping_status=1
+    fi
+
+    # Every IP in the input file must be classified UP or DOWN, on top of the
+    # subnet sweep's own hits. Counted rather than matched per-IP to stay linear
+    # in the input size.
+    if [ $ping_status -eq 0 ] && [ -f "$ping_in" ]; then
+        ping_expected=$(grep -cvE '^[[:space:]]*(#|$)' "$ping_in")
+        ping_seen=$(grep -c "is UP\|is DOWN" "$ping_out")
+        if [ "$ping_seen" -lt "$ping_expected" ]; then
+            echo "ERROR [ping]: Only $ping_seen host results recorded for $ping_expected input IPs" >&2
+            ping_status=1
+        fi
+    fi
+
+    report "ping" $ping_status
+fi
 
 if should_run "accept-ips"; then
     accept_ips_out="$outputs_dir/accept-ips_$size.txt"
@@ -83,45 +154,4 @@ if should_run "accept-ips"; then
     fi
 
     report "accept-ips" $accept_ips_status
-fi
-
-if should_run "massvulscan"; then
-    mvs_out="$outputs_dir/massvulscan_output.txt"
-    mvs_status=0
-    
-    if grep -qE "Root required|Conflict:|Empty input|No targets|Invalid DNS|No live hosts" "$mvs_out"; then
-        mvs_status=1
-    fi
-
-    if grep -qE "command not found|Permission denied" "$mvs_out"; then
-        mvs_status=1
-    fi
-
-    report "massvulscan" $mvs_status
-fi
-
-if should_run "pingsweep"; then
-    ps_out="$outputs_dir/pingsweep.txt"
-    ps_status=0
-    if [ ! -s "$ps_out" ]; then
-        echo "ERROR [pingsweep]: Output file '$ps_out' is missing or empty" >&2
-        ps_status=1
-    fi
-    if [ $ps_status -eq 0 ]; then
-        if ! grep -q "is UP" "$ps_out"; then
-            echo "ERROR [pingsweep]: No 'is UP' markers found in output (no hosts detected)" >&2
-            ps_status=1
-        fi
-    fi
-    
-    if [ $ps_status -eq 0 ]; then
-        # Check for localhost instead of gateway
-        if ! grep -q "127.0.0.1 is UP" "$ps_out"; then
-            echo "ERROR [pingsweep]: Localhost 127.0.0.1 not detected as UP" >&2
-            echo "DEBUG [pingsweep]: Checking what hosts were found..." >&2
-            grep "is UP" "$ps_out" >&2 || echo "DEBUG [pingsweep]: No UP hosts in output" >&2
-            ps_status=1
-        fi
-    fi
-    report "pingsweep" $ps_status
 fi
