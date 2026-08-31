@@ -49,6 +49,10 @@ case "$OS" in
         sudo apt-get update
         sudo apt-get install -y --no-install-recommends makedeb
 
+        # makedeb is installed; the repository is no longer needed.
+        sudo rm -f /etc/apt/sources.list.d/makedeb.list
+        sudo rm -f /usr/share/keyrings/makedeb-archive-keyring.gpg
+
         # Install Node.js (18.x) and npm via NodeSource, if the earlier apt install
         # of nodejs somehow didn't take
         if ! command -v node > /dev/null 2>&1 ; then

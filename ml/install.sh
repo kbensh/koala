@@ -3,6 +3,9 @@
 TOP=$(git rev-parse --show-toplevel)
 OS=$("$TOP/.tools/detect-os.sh")
 
+VENV_DIR="$TOP/venv"
+. "$VENV_DIR/bin/activate"
+
 case "$OS" in
     debian)
         sudo apt-get update

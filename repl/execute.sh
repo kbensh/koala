@@ -56,6 +56,15 @@ should_run() {
     return 1
 }
 
+PORT_PID=""
+
+if should_run "vps-audit" || should_run "vps-audit-negate"; then
+    python3 -m http.server 8765 --bind 0.0.0.0 >/dev/null 2>&1 &
+    PORT_PID=$!
+    trap cleanup_port EXIT INT TERM
+    sleep 1
+fi
+
 if should_run "vps-audit"; then
     BENCHMARK_SCRIPT="$(realpath "$main_script_1")"
     export BENCHMARK_SCRIPT
@@ -70,6 +79,13 @@ if should_run "vps-audit-negate"; then
     ${KOALA_SHELL} "${main_script_2}"
     echo $?
 fi
+
+if [ -n "$PORT_PID" ]; then
+        kill "$PORT_PID" 2>/dev/null || true
+        wait "$PORT_PID" 2>/dev/null || true
+    fi
+    
+trap - EXIT INT TERM
 
 if should_run "git-workflow"; then
     echo "Starting git workflow..."

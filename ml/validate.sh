@@ -6,6 +6,8 @@ eval_dir="${TOP}/ml"
 # shell script to run verify.py
 parsed_args=""
 
+VENV_DIR="$TOP/venv"
+. "$VENV_DIR/bin/activate"
 
 size="full"
 for arg in "$@"; do

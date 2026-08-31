@@ -5,6 +5,9 @@ TOP=$(git rev-parse --show-toplevel)
 eval_dir="${TOP}/ml"
 scripts_dir="${eval_dir}/scripts"
 
+VENV_DIR="$TOP/venv"
+. "$VENV_DIR/bin/activate"
+
 KOALA_SHELL=${KOALA_SHELL:-bash}
 export BENCHMARK_CATEGORY="ml"
 export LC_ALL=C

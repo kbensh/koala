@@ -14,7 +14,7 @@ done
 case "$OS" in
     debian)
         sudo apt-get update
-        pkgs="build-essential libncurses5-dev libncursesw5-dev libbz2-dev liblzma-dev libcurl4-openssl-dev libssl-dev wget zlib1g-dev minimap2 samtools"
+        pkgs="build-essential libncurses5-dev libncursesw5-dev libbz2-dev liblzma-dev libcurl4-openssl-dev libssl-dev wget zlib1g-dev libdeflate-dev"
 
         for pkg in $pkgs; do
             if ! dpkg -s "$pkg" >/dev/null 2>&1; then
@@ -33,7 +33,7 @@ case "$OS" in
         ;;
     fedora)
         sudo dnf makecache
-        pkgs="gcc gcc-c++ make ncurses-devel bzip2-devel xz-devel libcurl-devel openssl-devel wget zlib-ng-compat-devel minimap2 samtools perl-Digest-SHA"
+        pkgs="gcc gcc-c++ make ncurses-devel bzip2-devel xz-devel libcurl-devel openssl-devel wget zlib-ng-compat-devel perl-Digest-SHA libdeflate-devel"
 
         for pkg in $pkgs; do
             if ! rpm -q "$pkg" >/dev/null 2>&1; then
@@ -42,6 +42,34 @@ case "$OS" in
         done
         ;;
 esac
+
+SAMTOOLS_VERSION="${SAMTOOLS_VERSION:-1.16.1}"
+
+if ! command -v samtools >/dev/null 2>&1 \
+    || ! samtools --version 2>&1 | grep -q "$SAMTOOLS_VERSION" \
+    || ! samtools --version 2>&1 | grep -q 'libdeflate=yes'; then
+    rm -rf "/tmp/samtools-${SAMTOOLS_VERSION}" /tmp/samtools.tar.bz2
+    curl -L "https://github.com/samtools/samtools/releases/download/${SAMTOOLS_VERSION}/samtools-${SAMTOOLS_VERSION}.tar.bz2" \
+        -o /tmp/samtools.tar.bz2
+    tar -xjf /tmp/samtools.tar.bz2 -C /tmp
+    cd "/tmp/samtools-${SAMTOOLS_VERSION}" || exit 1
+    ./configure --prefix=/usr/local
+    make -j"$NPROC"
+    sudo make install
+    cd / || exit 1
+    rm -rf "/tmp/samtools-${SAMTOOLS_VERSION}" /tmp/samtools.tar.bz2
+fi
+command -v minimap2 >/dev/null 2>&1 || { \
+    git clone --depth 1 https://github.com/lh3/minimap2.git /tmp/minimap2 \
+    && cd /tmp/minimap2 \
+    && make -j"$NPROC" \
+    && cp minimap2 /usr/local/bin/ \
+    && cp ./*.py /usr/local/bin/ \
+    && cd / && rm -rf /tmp/minimap2; }
+
+if [ "$size" = "min" ]; then
+    exit 0
+fi
 
 if [ "$size" = "min" ]; then
     exit 0
@@ -55,35 +83,14 @@ benchmark_dir="${TOP}/bio"
 # 1. Install OS packages
 case "$OS" in
     debian)
-        sudo apt-get install -y --no-install-recommends \
-            build-essential \
-            git \
-            wget \
-            curl \
-            python3 \
-            python3-dev \
-            python3-all-dev \
-            python3-pip \
-            perl \
-            cpanminus \
-            libdbi-perl \
-            zlib1g-dev \
-            libbz2-dev \
-            liblzma-dev \
-            libcurl4-openssl-dev \
-            openjdk-17-jdk \
-            default-jre-headless \
-            r-base \
-            r-base-dev \
-            gradle \
-            cmake \
-            make \
-            gcc \
-            g++ \
-            gffread \
-            gmap \
-            parallel \
-         && rm -rf /var/lib/apt/lists/*
+                pkgs="build-essential git wget curl python3 python3-dev perl cpanminus libdbi-perl zlib1g-dev libbz2-dev libdeflate-dev liblzma-dev libcurl4-openssl-dev openjdk-17-jdk default-jre-headless r-base r-base-dev gradle cmake make gcc g++ gffread gmap parallel"
+
+        for pkg in $pkgs; do
+            if ! dpkg -s "$pkg" >/dev/null 2>&1; then
+                sudo apt-get install -y --no-install-recommends "$pkg"
+            fi
+        done
+        rm -rf /var/lib/apt/lists/*
 
         sudo wget -qO /usr/local/bin/liftOver http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/liftOver
         sudo chmod +x /usr/local/bin/liftOver
@@ -121,38 +128,16 @@ case "$OS" in
         fi
 
         # Prebuilt macOS wheels exist for this pipeline's Python packages, so
-        # no C-header setup is needed here (unlike bio's other from-source
-        # builds below, e.g. gmap above).
+        # the explicit Python-header CFLAGS the debian branch needs aren't.
         ;;
     fedora)
-        sudo dnf install -y \
-            gcc \
-            gcc-c++ \
-            make \
-            git \
-            wget \
-            curl \
-            python3 \
-            python3-devel \
-            python3-pip \
-            perl \
-            perl-App-cpanminus \
-            perl-DBI \
-            zlib-ng-compat-devel \
-            bzip2-devel \
-            xz-devel \
-            libcurl-devel \
-            openssl-devel \
-            ncurses-devel \
-            openjdk-17-devel \
-            R \
-            R-devel \
-            gradle \
-            cmake \
-            gffread \
-            gmap \
-            parallel \
-            unzip
+        pkgs="gcc gcc-c++ make git wget curl python3 python3-devel python3-pip perl perl-App-cpanminus perl-DBI libdeflate-devel zlib-ng-compat-devel bzip2-devel xz-devel libcurl-devel openssl-devel ncurses-devel openjdk-17-devel R R-devel gradle cmake gffread gmap parallel unzip"
+
+        for pkg in $pkgs; do
+            if ! rpm -q "$pkg" >/dev/null 2>&1; then
+                sudo dnf install -y "$pkg"
+            fi
+        done
 
         sudo wget -qO /usr/local/bin/liftOver http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/liftOver
         sudo chmod +x /usr/local/bin/liftOver
@@ -178,20 +163,6 @@ pip3 install --no-cache-dir --break-system-packages \
 ## samtools & minimap2
 # Prefer system versions if available; otherwise build from source
 NPROC=$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)
-command -v samtools >/dev/null 2>&1 || { \
-    git clone --depth 1 https://github.com/samtools/samtools.git /tmp/samtools \
-    && cd /tmp/samtools \
-    && autoheader && autoconf -Wno-syntax -Wno-error \
-    && ./configure --prefix=/usr/local \
-    && make -j"$NPROC" && make install \
-    && cd / && rm -rf /tmp/samtools; }
-command -v minimap2 >/dev/null 2>&1 || { \
-    git clone --depth 1 https://github.com/lh3/minimap2.git /tmp/minimap2 \
-    && cd /tmp/minimap2 \
-    && make -j"$NPROC" \
-    && cp minimap2 /usr/local/bin/ \
-    && cp ./*.py /usr/local/bin/ \
-    && cd / && rm -rf /tmp/minimap2; }
 
 ## seqkit
 command -v seqkit >/dev/null 2>&1 || {

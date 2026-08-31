@@ -36,7 +36,7 @@ uv python install 3.11
 
 VENV_DIR="$TOP/venv"
 rm -rf "$VENV_DIR"
-uv venv --python 3.11 "$VENV_DIR"
+uv venv --python 3.11 --seed "$VENV_DIR"
 
 . "$VENV_DIR/bin/activate"
 

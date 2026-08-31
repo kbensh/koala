@@ -45,6 +45,21 @@ done
 statistics_dir="${eval_dir}/outputs/statistics.$size"
 correct_dir="${eval_dir}/correct-results/statistics.$size"
 
+normalize_weather_path() {
+    candidate="$1"
+    candidate=$(printf '%s' "$candidate" | tr -d '\r')
+    candidate=$(printf '%s' "$candidate" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+
+    case "$candidate" in
+        *"/weather/"*)
+            printf '%s\n' "${candidate#*"/weather/"}"
+            ;;
+        *)
+            printf '%s\n' "$candidate"
+            ;;
+    esac
+}
+
 should_run() {
     script_name=$1
     if [ -z "$selected_scripts" ]; then
@@ -96,9 +111,15 @@ if should_run "tuft-weather"; then
 
     all_exist=true
     while IFS= read -r filepath; do
-        if [ ! -f "$filepath" ]; then
-            echo "Missing: $filepath"
+        [ -n "$filepath" ] || continue
+
+        normalized_path=$(normalize_weather_path "$filepath")
+        expected_path="$eval_dir/$normalized_path"
+
+        if [ ! -f "$expected_path" ]; then
+            echo "Missing: $expected_path"
             all_exist=false
+            break
         fi
     done < "$hash_file"
 

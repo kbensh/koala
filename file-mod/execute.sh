@@ -1,7 +1,9 @@
 #!/bin/sh
 
-
 TOP=$(git rev-parse --show-toplevel)
+
+export PATH="/usr/local/legacy-bin:$PATH"
+
 eval_dir="${TOP}/file-mod"
 input_dir="${eval_dir}/inputs"
 outputs_dir="${eval_dir}/outputs"

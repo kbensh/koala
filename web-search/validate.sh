@@ -6,6 +6,9 @@ TOP=$(git rev-parse --show-toplevel)
 eval_dir="$TOP/web-search"
 scripts_dir="$eval_dir/scripts"
 
+NODE_DIR="$TOP/.tools/nodejs18/bin" 
+export PATH="$NODE_DIR:$PATH"
+
 in="$eval_dir/inputs"
 out="$eval_dir/outputs"
 export IN="${in}"

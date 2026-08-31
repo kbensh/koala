@@ -2,6 +2,10 @@
 
 
 TOP=$(git rev-parse --show-toplevel)
+
+VENV_DIR="$TOP/venv"
+. "$VENV_DIR/bin/activate"
+
 eval_dir="${TOP}/ml"
 input_dir="${eval_dir}/inputs"
 parsed_args=""

@@ -5,7 +5,7 @@ OS=$("$TOP/.tools/detect-os.sh")
 
 case "$OS" in
     debian)
-        pkgs="p7zip-full curl wget unzip npm"
+        pkgs="p7zip-full curl wget unzip"
 
         sudo apt-get update
         for pkg in $pkgs; do
@@ -23,11 +23,44 @@ case "$OS" in
           rm pandoc-3.5-1-"${arch}".deb
         fi
 
-        # Install Node.js (18.x) and npm via NodeSource
-        if ! command -v node > /dev/null 2>&1 ; then
-          curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-          sudo apt-get install -y --no-install-recommends nodejs
+        # Install Node.js 18.x locally for the benchmark
+        NODE_VERSION=18.20.8
+        NODE_DIR="$TOP/.tools/nodejs18"
+
+        if [ ! -x "$NODE_DIR/bin/node" ]; then
+          arch=$(dpkg --print-architecture)
+
+          case "$arch" in
+            amd64)
+              node_arch="x64"
+              ;;
+            arm64)
+              node_arch="arm64"
+              ;;
+            *)
+              echo "Unsupported architecture: $arch"
+              exit 1
+              ;;
+          esac
+
+          tmp=$(mktemp -d)
+
+          wget -q \
+            "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${node_arch}.tar.xz" \
+            -O "$tmp/node.tar.xz"
+
+          rm -rf "$NODE_DIR"
+          mkdir -p "$NODE_DIR"
+
+          tar -xJf "$tmp/node.tar.xz" \
+            --strip-components=1 \
+            -C "$NODE_DIR"
+
+          rm -rf "$tmp"
         fi
+
+        # Use the benchmark's Node.js installation
+        export PATH="$NODE_DIR/bin:$PATH"
 
         # Verify node and npm installation
         if ! command -v node > /dev/null 2>&1 ; then
@@ -35,12 +68,17 @@ case "$OS" in
           exit 1
         fi
 
-        if ! dpkg -s nodejs > /dev/null 2>&1 ; then
-            # node version 18+ does not need external npm
-            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-            sudo apt-get install -y --no-install-recommends nodejs
+        NODE_MAJOR=18
+
+        node_major=$(node -p 'process.versions.node.split(".")[0]' 2>/dev/null || true)
+
+        if [ "$node_major" != "$NODE_MAJOR" ]; then
+          echo "Node.js 18.x installation failed."
+          echo "Found: $(node --version)"
+          exit 1
         fi
         ;;
+
     macos)
         # brew's node formula bundles npm; pandoc and p7zip are direct formulae,
         # no arch-specific download dance needed the way the .deb release requires.
@@ -51,8 +89,9 @@ case "$OS" in
           exit 1
         fi
         ;;
+
     fedora)
-        pkgs="p7zip curl wget unzip npm"
+        pkgs="p7zip curl wget unzip"
 
         sudo dnf makecache
         for pkg in $pkgs; do
@@ -66,11 +105,44 @@ case "$OS" in
           sudo dnf install -y pandoc
         fi
 
-        # Install Node.js (18.x) and npm via NodeSource
-        if ! command -v node > /dev/null 2>&1 ; then
-          curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
-          sudo dnf install -y nodejs
+        # Install Node.js 18.x locally for the benchmark
+        NODE_VERSION=18.20.8
+        NODE_DIR="$TOP/.tools/nodejs18"
+
+        if [ ! -x "$NODE_DIR/bin/node" ]; then
+          arch=$(uname -m)
+
+          case "$arch" in
+            x86_64)
+              node_arch="x64"
+              ;;
+            aarch64)
+              node_arch="arm64"
+              ;;
+            *)
+              echo "Unsupported architecture: $arch"
+              exit 1
+              ;;
+          esac
+
+          tmp=$(mktemp -d)
+
+          wget -q \
+            "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${node_arch}.tar.xz" \
+            -O "$tmp/node.tar.xz"
+
+          rm -rf "$NODE_DIR"
+          mkdir -p "$NODE_DIR"
+
+          tar -xJf "$tmp/node.tar.xz" \
+            --strip-components=1 \
+            -C "$NODE_DIR"
+
+          rm -rf "$tmp"
         fi
+
+        # Use the benchmark's Node.js installation
+        export PATH="$NODE_DIR/bin:$PATH"
 
         # Verify node and npm installation
         if ! command -v node > /dev/null 2>&1 ; then
@@ -78,16 +150,31 @@ case "$OS" in
           exit 1
         fi
 
-        if ! rpm -q nodejs > /dev/null 2>&1 ; then
-            curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
-            sudo dnf install -y nodejs
+        NODE_MAJOR=18
+
+        node_major=$(node -p 'process.versions.node.split(".")[0]' 2>/dev/null || true)
+
+        if [ "$node_major" != "$NODE_MAJOR" ]; then
+          echo "Node.js 18.x installation failed."
+          echo "Found: $(node --version)"
+          exit 1
+        fi
+
+        if ! command -v npm > /dev/null 2>&1 ; then
+          echo "npm installation failed."
+          exit 1
         fi
         ;;
 esac
 
 cd "$(dirname "$0")/scripts" || exit 1
-if [ ! -d node_modules ]; then
-  npm install html-to-text jsdom natural
-fi
 
-cd -  || exit 1
+rm -rf node_modules package-lock.json
+
+npm install --save-exact \
+  html-to-text@9.0.5 \
+  jsdom@15.2.1 \
+  natural@5.2.0 \
+  afinn-165@1.0.2
+
+cd - || exit 1

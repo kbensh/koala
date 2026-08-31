@@ -3,6 +3,8 @@
 
 cd "$(realpath "$(dirname "$0")")" || exit 1
 
+export PATH="/usr/local/legacy-bin:$PATH"
+
 outputs_dir="outputs"
 hashes_dir="hashes"
 TOP="$(git rev-parse --show-toplevel)"
@@ -124,6 +126,18 @@ if should_run "thumbnail_generation"; then
 fi
 
 if should_run "to_mp3"; then
-    hash_audio_dir "$eval_dir/$outputs_dir/to_mp3$suffix" | diff -q "$eval_dir/$hashes_dir/to_mp3$suffix.md5sum" -
-    echo "to_mp3 $?"
+    generated_tmp=$(mktemp)
+    expected_tmp=$(mktemp)
+
+    hash_audio_dir "$eval_dir/$outputs_dir/to_mp3$suffix" | sort > "$generated_tmp"
+    sort "$eval_dir/$hashes_dir/to_mp3$suffix.md5sum" > "$expected_tmp"
+
+    if diff -q "$expected_tmp" "$generated_tmp" >/dev/null 2>&1; then
+        status=0
+    else
+        status=1
+    fi
+
+    rm -f "$generated_tmp" "$expected_tmp"
+    echo "to_mp3 $status"
 fi
