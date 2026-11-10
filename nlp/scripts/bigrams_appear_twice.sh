@@ -15,7 +15,7 @@ pure_func() {
     tail -n +2 ${TEMPDIR}/${input}.input.words > ${TEMPDIR}/${input}.input.nextwords
     paste ${TEMPDIR}/${input}.input.words ${TEMPDIR}/${input}.input.nextwords | sort | uniq -c > ${TEMPDIR}/${input}.input.bigrams
     awk "\$1 == 2 {print \$2, \$3}" ${TEMPDIR}/${input}.input.bigrams
-    rm -rf {TEMPDIR}
+    rm -rf ${TEMPDIR}
 }
 
 export -f pure_func
