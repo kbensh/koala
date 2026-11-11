@@ -5,8 +5,6 @@ import sys
 from decimal import Decimal, ROUND_HALF_UP
 
 
-PNG_LINE_PATTERN = re.compile(r'^"\S+\.png"(?:\s.+)?$')
-
 FULL_LINE_PATTERN = re.compile(r'''
     ^"(?P<name>\S+\.png)"         # "pl-06-P_F-A_N-1.png"
     \s+(?P<x>\d+)\s+(?P<y>\d+)    # bbox x y
@@ -32,14 +30,23 @@ def round_score(line: str, decimals: int = 2) -> str:
             f"{gd['label']} {score:.{decimals}f}")
 
 def clean_output_file(input_path: str, output_path: str, decimals: int = 2) -> None:
-    with open(input_path, 'r', encoding='utf-8', errors='ignore') as infile, \
-         open(output_path, 'w', encoding='utf-8', newline='\n') as outfile:
+    records = []
+    with open(input_path, 'r', encoding='utf-8', errors='ignore') as infile:
         for raw in infile:
             line = ANSI_ESCAPE.sub('', raw)
             line = BACKSPACE.sub('', line).strip()
 
-            if PNG_LINE_PATTERN.match(line):
-                outfile.write(round_score(line, decimals) + '\n')
+            # Keep only complete prediction records; filename-only lines are
+            # artifacts of Keras progress output split on carriage returns.
+            if FULL_LINE_PATTERN.match(line):
+                records.append(round_score(line, decimals))
+
+    # The order in which segments are emitted is not part of the result and
+    # varies across dependency versions (e.g., Pillow), so write the records in
+    # a canonical order. Duplicate records are preserved.
+    with open(output_path, 'w', encoding='utf-8', newline='\n') as outfile:
+        for record in sorted(records):
+            outfile.write(record + '\n')
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
