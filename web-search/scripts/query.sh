@@ -17,4 +17,6 @@ stems=$(
   printf '%s\n' "$@" | "$PROCESS" | "$STEM" | tr '\r\n' '  '
 )
 
-grep "^$stems\b" "$INDEX"
+# Each stem is followed by a space, so the pattern matches the query terms as
+# whole words followed by either another term or the index's "|" delimiter.
+grep "^$stems" "$INDEX"
