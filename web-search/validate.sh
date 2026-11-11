@@ -17,8 +17,12 @@ export OUT="${out}"
 INDEX="$out/global-index.txt"
 QUERY_SH="$scripts_dir/query.sh"
 
+# Index keys are already stemmed, and stemming is not idempotent, so they
+# cannot be passed back to query.sh as query text. Instead, query with the
+# original (unstemmed) words of the last indexed page, which query.sh
+# processes and stems exactly as index.sh did.
 TERMS=$(
-  awk '{print $1}' "$INDEX" |
+  "$scripts_dir/c/process.sh" < "$out/content.txt" |
     awk 'length($0) > 2' |
     awk '!seen[$0]++' |
     shuf |
