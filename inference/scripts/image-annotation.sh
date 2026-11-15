@@ -6,7 +6,7 @@ mkdir -p "$OUT"
 
 ollama serve > /dev/null 2>&1 &
 find "$IN" -type f -iname "*.jpg" | while IFS= read -r img; do
-    title=$(llm -m moondream:latest \
+    title=$(llm -m ollama/moondream:latest \
         "Your only output should be a **single** small title for this image:" \
         -a "$img" -o seed 0 -o temperature 0 < /dev/null)
 
