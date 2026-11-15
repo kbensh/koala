@@ -62,7 +62,8 @@ pip install --break-system-packages numpy \
     Pillow \
     segment-anything \
     tensorflow \
-    opencv-python
+    opencv-python \
+    transformers==4.57.6
 
 # check if ollama is installed
 if ! command -v ollama >/dev/null 2>&1
