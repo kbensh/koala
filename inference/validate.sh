@@ -54,6 +54,63 @@ should_run() {
     return 1
 }
 
+validate_playlist() {
+    playlist=$1
+    input_dir=$2
+    songs_root=$3
+
+    if [ ! -s "$playlist" ]; then
+        echo "Playlist $playlist is missing or empty"
+        return 1
+    fi
+
+    expected=$(find "$input_dir" -type f -name "*.mp3" | sort)
+    expected_count=$(printf '%s\n' "$expected" | wc -l)
+    expected_first=$(realpath "$(printf '%s\n' "$expected" | head -n 1)")
+    expected_last=$(realpath "$(printf '%s\n' "$expected" | tail -n 1)")
+
+    entries=$(sed 's/^"//; s/"$//' "$playlist")
+    count=$(printf '%s\n' "$entries" | wc -l)
+
+    if [ "$count" -ne "$expected_count" ]; then
+        echo "Playlist $playlist has $count entries, expected $expected_count"
+        return 1
+    fi
+
+    if [ "$(printf '%s\n' "$entries" | sort -u | wc -l)" -ne "$count" ]; then
+        echo "Playlist $playlist contains duplicate entries"
+        return 1
+    fi
+
+    while IFS= read -r entry; do
+        case "$entry" in
+            "$songs_root"/*.mp3) ;;
+            *)
+                echo "Playlist $playlist has an entry outside the inputs: $entry"
+                return 1
+                ;;
+        esac
+        if [ ! -f "$entry" ]; then
+            echo "Playlist $playlist has an entry that does not exist: $entry"
+            return 1
+        fi
+    done <<EOF
+$entries
+EOF
+
+    if [ "$(printf '%s\n' "$entries" | head -n 1)" != "$expected_first" ]; then
+        echo "Playlist $playlist does not start at $expected_first"
+        return 1
+    fi
+
+    if [ "$(printf '%s\n' "$entries" | tail -n 1)" != "$expected_last" ]; then
+        echo "Playlist $playlist does not end at $expected_last"
+        return 1
+    fi
+
+    return 0
+}
+
 if $generate; then
     mkdir -p "$hashes_dir"
 
@@ -102,13 +159,14 @@ if should_run "playlist-creation"; then
     outputs_dir="outputs/songs$suffix"
     filelist="$hashes_dir/songs$suffix.files"
 
+    songs_dir=$(realpath "$eval_dir/inputs/songs$suffix")
+
     cd "$outputs_dir" || exit 1
     status=0
 
     if [ -f "$filelist" ]; then
         while read -r file; do
-            if [ ! -f "$file" ]; then
-                echo "File $file not found"
+            if ! validate_playlist "$file" "$songs_dir/$(dirname "$file")" "$songs_dir"; then
                 status=1
             fi
         done < "$filelist"
