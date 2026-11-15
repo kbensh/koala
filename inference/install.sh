@@ -54,7 +54,7 @@ pip install --break-system-packages --upgrade pip
 pip install --break-system-packages llm
 pip install --break-system-packages llm-interpolate
 pip install --break-system-packages llm-clap
-pip install --break-system-packages llm-ollama
+pip install --break-system-packages llm-ollama==0.19.1
 
 pip install --break-system-packages numpy \
     torch \
