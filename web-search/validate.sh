@@ -18,7 +18,7 @@ INDEX="$out/global-index.txt"
 QUERY_SH="$scripts_dir/query.sh"
 
 TERMS=$(
-  awk '{print $1}' "$INDEX" |
+  "$scripts_dir/c/process.sh" < "$out/content.txt" |
     awk 'length($0) > 2' |
     awk '!seen[$0]++' |
     shuf |
