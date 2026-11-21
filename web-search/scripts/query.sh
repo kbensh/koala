@@ -17,4 +17,4 @@ stems=$(
   printf '%s\n' "$@" | "$PROCESS" | "$STEM" | tr '\r\n' '  '
 )
 
-grep "^$stems\b" "$INDEX"
+grep "^$stems" "$INDEX"
