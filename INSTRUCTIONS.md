@@ -314,6 +314,8 @@ The analysis produces CSV summaries and heatmaps across the benchmark suite, hig
 
 The table below contains all links to the inputs. Note: Some of these inputs are extremely large and hosted on low-bandwidth permanent-storage services such as Zenodo.
 
+The fetch scripts download from `https://atlas.cs.brown.edu/data` by default. Set `KOALA_DATA_URL` to use a mirror.
+
 | Benchmark       | Min                                                                                                   | Small                                                                                                             | Full                                                                                                                                     |
 | --------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | `analytics`     | [Github Repo](https://github.com/binpash/benchmarks/tree/main/log-analysis/min_inputs)                | [Brown](https://atlas.cs.brown.edu/data/pcaps.zip) [Zenodo](https://zenodo.org/records/15361083)                  | [Brown](https://atlas.cs.brown.edu/data/pcaps_large.zip) [Zenodo](https://zenodo.org/records/15368510)                                   |

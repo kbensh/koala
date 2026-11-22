@@ -18,7 +18,7 @@ mkcd() {
 }
 
 # set link to plaintext PKGBUILDs
-URL='https://atlas.cs.brown.edu/data/aurpkg'
+URL="${KOALA_DATA_URL:-https://atlas.cs.brown.edu/data}/aurpkg"
 
 run_tests() {
     pkg=$1

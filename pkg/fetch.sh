@@ -5,7 +5,7 @@ set -e
 
 TOP=$(git rev-parse --show-toplevel)
 input_dir="$TOP/pkg/inputs"
-URL='https://atlas.cs.brown.edu/data'
+URL="${KOALA_DATA_URL:-https://atlas.cs.brown.edu/data}"
 
 size=full
 for arg in "$@"; do

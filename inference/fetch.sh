@@ -17,7 +17,7 @@ for arg in "$@"; do
 done
 export LC_ALL=C
 
-URL='https://atlas.cs.brown.edu/data'
+URL="${KOALA_DATA_URL:-https://atlas.cs.brown.edu/data}"
 
 full_dir="${input_dir}/dpt.full"
 small_dir="${input_dir}/dpt.small"
@@ -64,7 +64,7 @@ if [ "$size" = "full" ]; then
     fi
 fi
 
-URL="https://atlas-group.cs.brown.edu/data"
+URL="${KOALA_DATA_URL:-https://atlas.cs.brown.edu/data}"
 
 if [ "$size" = "small" ]; then
     # if inputs exist
@@ -117,7 +117,7 @@ else
         echo "Image data already downloaded and extracted."
     else
         echo "Downloading full dataset."
-        data_url=https://atlas-group.cs.brown.edu/data/full/jpg.zip
+        data_url="${URL}/full/jpg.zip"
         zip_dst="$input_dir/jpg.zip"
         out_dir="$input_dir/jpg"
         wget --no-check-certificate $data_url -O $zip_dst

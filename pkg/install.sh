@@ -115,7 +115,7 @@ case "$OS" in
 esac
 
 TOP=$(git rev-parse --show-toplevel)
-URL="https://atlas.cs.brown.edu/data"
+URL="${KOALA_DATA_URL:-https://atlas.cs.brown.edu/data}"
 installdir="$TOP/pkg/inputs"
 
 mkdir -p "$installdir"

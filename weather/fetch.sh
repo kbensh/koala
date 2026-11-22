@@ -6,7 +6,7 @@ TOP=$(git rev-parse --show-toplevel)
 eval_dir="${TOP}/weather"
 input_dir="${eval_dir}/inputs"
 
-URL='https://atlas.cs.brown.edu/data'
+URL="${KOALA_DATA_URL:-https://atlas.cs.brown.edu/data}"
 URL=$URL/max-temp
 
 mkdir -p "${input_dir}"
