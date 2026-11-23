@@ -2,7 +2,7 @@
 
 
 TOP=$(git rev-parse --show-toplevel)
-URL="https://atlas.cs.brown.edu/data"
+URL="${KOALA_DATA_URL:-https://atlas.cs.brown.edu/data}"
 
 input_dir="${TOP}/nlp/inputs"
 mkdir -p "$input_dir"

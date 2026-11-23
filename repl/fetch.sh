@@ -1,7 +1,7 @@
 #!/bin/sh
 
 
-URL='https://atlas.cs.brown.edu/data/'
+URL="${KOALA_DATA_URL:-https://atlas.cs.brown.edu/data}/"
 
 TOP=$(git rev-parse --show-toplevel)
 

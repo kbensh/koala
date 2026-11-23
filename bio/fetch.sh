@@ -3,7 +3,7 @@
 
 TOP=$(git rev-parse --show-toplevel)
 cd "$(realpath "$(dirname "$0")")" || exit 1
-URL='https://atlas.cs.brown.edu/data'
+URL="${KOALA_DATA_URL:-https://atlas.cs.brown.edu/data}"
 
 IN="inputs"
 IN_NAME="input.txt"

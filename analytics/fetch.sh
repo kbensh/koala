@@ -4,7 +4,7 @@
 TOP=$(git rev-parse --show-toplevel)
 eval_dir="${TOP}/analytics"
 input_dir="${eval_dir}/inputs"
-URL=https://atlas.cs.brown.edu/data
+URL="${KOALA_DATA_URL:-https://atlas.cs.brown.edu/data}"
 mkdir -p "$input_dir"
 
 size=full

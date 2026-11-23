@@ -2,7 +2,7 @@
 
 
 cd "$(dirname "$0")" || exit 1
-URL='https://atlas.cs.brown.edu/data'
+URL="${KOALA_DATA_URL:-https://atlas.cs.brown.edu/data}"
 in="./inputs"
 
 mkdir -p "$in"
